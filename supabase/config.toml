@@ -1,0 +1,6 @@
+project_id = "obifekwncoeuhvcnbckk"
+
+[functions.admin-users]
+# The function verifies the Supabase user token with auth.getUser() and checks app_admins itself.
+verify_jwt = false
+
