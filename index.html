@@ -258,7 +258,7 @@
           const total=document.createElement('td');total.className='total empty';total.dataset.label='Total';total.textContent='—';tr.append(total);calc(tr);body.append(tr)}
         $('hourlyRate').value=readHourlyRate()??'';renderExpenses();summary()}
       let activeDay=null;const dayDialog=$('dayDialog'),dayForm=$('dayForm');function openDayForm(day){activeDay=Number(day);const y=Number(ys.value),m=Number(ms.value),date=new Date(y,m,activeDay),row=read()[String(activeDay)]||['','',''];$('dayDialogTitle').textContent='Jornada';$('dayDialogDate').textContent=date.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});$('dayEntry').value=row[0]||'';$('dayExit').value=row[1]||'';$('dayLunch').value=row[2]||'';$('dayObservation').value=row[3]||'';$('dayFormMessage').textContent='';if(typeof dayDialog.showModal==='function')dayDialog.showModal();else dayDialog.setAttribute('open','')}
-      $('calendarView').addEventListener('click',event=>{const button=event.target.closest('button[data-day]');if(button)openDayForm(button.dataset.day)});$('calendarViewBtn').addEventListener('click',()=>{$('calendarView').hidden=false;$('listView').hidden=true;$('calendarViewBtn').classList.add('primary');$('listViewBtn').classList.remove('primary');$('calendarViewBtn').setAttribute('aria-pressed','true');$('listViewBtn').setAttribute('aria-pressed','false')});$('listViewBtn').addEventListener('click',()=>{$('calendarView').hidden=true;$('listView').hidden=false;$('listViewBtn').classList.add('primary');$('calendarViewBtn').classList.remove('primary');$('listViewBtn').setAttribute('aria-pressed','true');$('calendarViewBtn').setAttribute('aria-pressed','false')});$('closeDayDialog').addEventListener('click',()=>dayDialog.close?.());$('cancelDayDialog').addEventListener('click',()=>dayDialog.close?.());dayDialog.addEventListener('click',event=>{if(event.target===dayDialog)dayDialog.close?.()});dayForm.addEventListener('submit',event=>{event.preventDefault();const entry=$('dayEntry').value,exit=$('dayExit').value,lunch=$('dayLunch').value,observation=$('dayObservation').value.trim();if((entry&&!exit)||(!entry&&exit)){ $('dayFormMessage').textContent='Completa Entrada y Salida para registrar el día.';return }if(entry&&exit&&lunch!==''&&Number(lunch)>24){$('dayFormMessage').textContent='El almuerzo no puede superar 24 horas.';return}const data=read();if(entry||exit||lunch||observation)data[String(activeDay)]=[entry,exit,lunch,observation];else delete data[String(activeDay)];localStorage.setItem(key(),JSON.stringify(data));dayDialog.close?.();render();status('Jornada guardada')});
+      $('calendarView').addEventListener('click',event=>{const button=event.target.closest('button[data-day]');if(button)openDayForm(button.dataset.day)});$('calendarViewBtn').addEventListener('click',()=>{$('calendarView').hidden=false;$('listView').hidden=true;$('calendarViewBtn').classList.add('primary');$('listViewBtn').classList.remove('primary');$('calendarViewBtn').setAttribute('aria-pressed','true');$('listViewBtn').setAttribute('aria-pressed','false');render()});$('listViewBtn').addEventListener('click',()=>{$('calendarView').hidden=true;$('listView').hidden=false;$('listViewBtn').classList.add('primary');$('calendarViewBtn').classList.remove('primary');$('listViewBtn').setAttribute('aria-pressed','true');$('calendarViewBtn').setAttribute('aria-pressed','false');render()});$('closeDayDialog').addEventListener('click',()=>dayDialog.close?.());$('cancelDayDialog').addEventListener('click',()=>dayDialog.close?.());dayDialog.addEventListener('click',event=>{if(event.target===dayDialog)dayDialog.close?.()});dayForm.addEventListener('submit',event=>{event.preventDefault();const entry=$('dayEntry').value,exit=$('dayExit').value,lunch=$('dayLunch').value,observation=$('dayObservation').value.trim();if((entry&&!exit)||(!entry&&exit)){ $('dayFormMessage').textContent='Completa Entrada y Salida para registrar el día.';return }if(entry&&exit&&lunch!==''&&Number(lunch)>24){$('dayFormMessage').textContent='El almuerzo no puede superar 24 horas.';return}const data=read();if(entry||exit||lunch||observation)data[String(activeDay)]=[entry,exit,lunch,observation];else delete data[String(activeDay)];localStorage.setItem(key(),JSON.stringify(data));dayDialog.close?.();render();status('Jornada guardada')});
       function calc(tr){const [a,b,l]=[...tr.querySelectorAll('input')].map(x=>x.value);const cell=tr.querySelector('.total');delete cell.dataset.hours;const worked=workedHours(a,b,l);if(worked===null){cell.textContent=!a||!b?'—':'Revisar pausa';cell.classList.add('empty');return}cell.dataset.hours=worked;cell.textContent=`${fmtHours.format(worked)} h`;cell.classList.remove('empty')}
       function summary(){let total=0,days=0;for(const row of Object.values(read())){if(!Array.isArray(row))continue;const value=workedHours(row[0],row[1],row[2]??'');if(value!==null){total+=value;days++}}const wage=Number(readHourlyRate());const gross=Number.isFinite(wage)&&wage>0?total*wage:null;const expenseTotal=readExpenses().reduce((sum,item)=>sum+(Number(item.amount)||0),0);
         $('hoursValue').textContent=`${fmtHours.format(total)} h`;$('daysValue').textContent=`${days} ${days===1?'jornada':'jornadas'}`;
@@ -373,7 +373,7 @@
             for(const [dayText,row] of Object.entries(monthData.days)){
               const day=Number(dayText);
               if(!Number.isInteger(day)||day<1||day>maxDay||!Array.isArray(row)||row.length!==3)throw new Error('Hay un registro diario con fecha o formato no válido.');
-              saved[String(day)]=row;dayCount++;
+              saved[String(day)]=[...row,(saved[String(day)]||[])[3]||''];dayCount++;
             }
             localStorage.setItem(monthKey,JSON.stringify(saved));
             localStorage.setItem(`nufri-settings-v1-hourly-rate-2026-${month}`,JSON.stringify(monthData.hourlyRate));
@@ -408,7 +408,7 @@
         showActionToast(`Año ${year} eliminado. Si tienes la sesión iniciada, el cambio también se sincronizará con Supabase.`);
       });
       const scheme=window.matchMedia('(prefers-color-scheme: dark)');const applyTheme=()=>document.querySelector('meta[name="theme-color"]').content=scheme.matches?'#0c151e':'#172c46';applyTheme();scheme.addEventListener?.('change',applyTheme);
-      ms.value='0';render();refresh();
+      $('prevMonth').addEventListener('click',()=>moveMonth(-1));$('nextMonth').addEventListener('click',()=>moveMonth(1));function moveMonth(offset){let year=Number(ys.value),month=Number(ms.value)+offset;if(month<0){month=11;year--}else if(month>11){month=0;year++}if(year<2026||year>2035)return;ys.value=String(year);ms.value=String(month);render()}ms.value='0';render();refresh();
     })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -467,7 +467,7 @@
       }
       async function pushKey(key, payload, userId) {
         const { error } = await db.from('attendance_months').upsert({ user_id: userId, storage_key: key, payload: JSON.parse(payload) }, { onConflict: 'user_id,storage_key' });
-        if (error) { console.error('No se pudo sincronizar el registro', key, error); setMessage('No se pudo sincronizar: ' + error.message, 'error'); return false; }
+        if (error) { console.error('No se pudo sincronizar el registro', key, error); document.getElementById('saveStatus').textContent='Sincronización pendiente'; setMessage('No se pudo sincronizar: ' + error.message, 'error'); return false; }
         document.getElementById('saveStatus').textContent = 'Sincronizado con Supabase';
         return true;
       }
@@ -497,7 +497,7 @@
         const localKeys = Array.from({length: storage.length}, (_, i) => storage.key(i)).filter(isAppKey);
         for (const key of localKeys) { const local = storage.getItem(key); if (local && !remote.has(key) && !(await pushKey(key, local, user.id))) failed++; }
         if (failed) setMessage('Sesión iniciada. ' + failed + ' registros no se sincronizaron; revisa la configuración de la tabla.', 'error');
-        else setMessage('Sesión iniciada. Los cambios se sincronizan y quedan separados por usuario.', 'ok');
+        else { setMessage('Sesión iniciada. Los cambios se sincronizan y quedan separados por usuario.', 'ok'); document.getElementById('saveStatus').textContent='Sincronizado con Supabase'; }
         if (changed && !sessionStorage.getItem('nufri-sync-reloaded')) { sessionStorage.setItem('nufri-sync-reloaded', '1'); location.reload(); }
         else sessionStorage.removeItem('nufri-sync-reloaded');
         return failed === 0;
@@ -575,7 +575,7 @@
         currentUser = null; profileMenu.open = false; profileSettings.hidden = true; authPanel.hidden = true; form.hidden = false;
         profileTrigger.setAttribute('aria-label', 'Iniciar sesión');
         profileTrigger.title = 'Iniciar sesión';
-        setMessage('Sesión cerrada. Tus registros permanecen guardados en este navegador.');
+        document.getElementById('saveStatus').textContent='Guardado en este navegador'; setMessage('Sesión cerrada. Tus registros permanecen guardados en este navegador.');
       });
       db.auth.getSession().then(({data}) => { if (data.session) sync(data.session.user); });
     })();
