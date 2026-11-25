@@ -534,7 +534,7 @@
         const email = document.getElementById('authEmail').value.trim();
         if (!email) { setMessage('Escribe tu correo para enviarte el enlace de recuperación.', 'error'); document.getElementById('authEmail').focus(); return; }
         setMessage('Enviando enlace de recuperación…');
-        const redirectTo = window.location.origin + window.location.pathname;
+        const redirectTo = new URL('reset-password.html', window.location.href).toString();
         const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo });
         if (error) setMessage(error.message, 'error');
         else setMessage('Si existe una cuenta con ese correo, recibirás un enlace para restablecer la contraseña. Revisa también spam.', 'ok');
