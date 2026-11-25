@@ -102,7 +102,6 @@
     <div class="footer"><span>Los datos se guardan en este navegador. Usa Exportar CSV para conservar una copia.</span><span>La cotización se obtiene de una fuente pública de tipos de referencia, que puede llevar retraso.</span></div>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script>
     (()=> {
       const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -145,21 +144,33 @@
         const csv='\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(';')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`nufri-${y}-${String(m+1).padStart(2,'0')}.csv`;a.click();URL.revokeObjectURL(url)}
       $('expenseForm').addEventListener('submit',event=>{event.preventDefault();const amount=Number($('expenseAmount').value);if(!Number.isFinite(amount)||amount<=0)return;const list=readExpenses();list.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),category:$('expenseCategory').value,description:$('expenseDescription').value.trim(),amount});localStorage.setItem(expensesKey(),JSON.stringify(list));$('expenseDescription').value='';$('expenseAmount').value='';renderExpenses();summary();status('Gasto guardado')});
       $('hourlyRate').addEventListener('input',()=>{const value=$('hourlyRate').value;if(value===''||Number(value)>=0){localStorage.setItem(hourlyRateKey(),JSON.stringify(value===''?'':Number(value)));summary();status('Tarifa guardada')}})
+      let xlsxLoadPromise=null;
+      function loadXlsx(){
+        if(window.XLSX)return Promise.resolve(window.XLSX);
+        if(!xlsxLoadPromise)xlsxLoadPromise=new Promise((resolve,reject)=>{
+          const script=document.createElement('script');
+          script.src='https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+          script.async=true;
+          script.onload=()=>window.XLSX?resolve(window.XLSX):reject(new Error('No se pudo iniciar el lector Excel.'));
+          script.onerror=()=>reject(new Error('No se pudo cargar el lector de Excel. Comprueba la conexión e inténtalo otra vez.'));
+          document.head.append(script);
+        });
+        return xlsxLoadPromise;
+      }
       function parseExcelImport(workbook,fileName){
-        if(!window.XLSX)throw new Error('No se pudo cargar el lector de Excel. Comprueba la conexión e inténtalo otra vez.');
         const norm=value=>String(value??'').trim().toLocaleLowerCase('es');
         const number=value=>{
           if(typeof value==='number'&&Number.isFinite(value))return value;
           if(value==null||value==='')return null;
-          let text=String(value).trim().replace(/[€$\\s]/g,'');
-          if(text.includes(',')&&text.includes('.'))text=text.replace(/\\./g,'').replace(',','.');
+          let text=String(value).trim().replace(/[€$\s]/g,'');
+          if(text.includes(',')&&text.includes('.'))text=text.replace(/\./g,'').replace(',','.');
           else text=text.replace(',','.');
           const result=Number(text);return Number.isFinite(result)?result:null;
         };
         const dateParts=value=>{
           if(value instanceof Date&&!Number.isNaN(value.getTime()))return{year:value.getFullYear(),month:value.getMonth()+1,day:value.getDate()};
           if(typeof value==='number'&&value>10000){const d=XLSX.SSF.parse_date_code(value);return d?{year:d.y,month:d.m,day:d.d}:null}
-          const match=String(value??'').match(/(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})/);
+          const match=String(value??'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
           return match?{day:Number(match[1]),month:Number(match[2]),year:Number(match[3])}:null;
         };
         const time=value=>{
@@ -168,7 +179,7 @@
             const minutes=((Math.round((value%1)*1440)%1440)+1440)%1440;
             return String(Math.floor(minutes/60)).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
           }
-          const match=String(value).trim().match(/(\\d{1,2}):(\\d{2})/);
+          const match=String(value).trim().match(/(\d{1,2}):(\d{2})/);
           return match?String(Number(match[1])%24).padStart(2,'0')+':'+match[2]:'';
         };
         const monthNames=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -217,7 +228,7 @@
         const file=$('importFile').files?.[0];if(!file)return;
         try{
           if(!file.name.toLowerCase().endsWith('.xlsx'))throw new Error('Selecciona el libro Excel en formato .xlsx.');
-          const workbook=XLSX.read(await file.arrayBuffer(),{cellDates:true});
+          await loadXlsx();const workbook=window.XLSX.read(await file.arrayBuffer(),{cellDates:true});
           const payload=parseExcelImport(workbook,file.name);
           let monthCount=0,dayCount=0,expenseCount=0;
           for(const [monthText,monthData] of Object.entries(payload.months)){
