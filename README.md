@@ -1,5 +1,8 @@
 # Control de jornada Nufri 2027
 
+**© 2026 Jhon Zarate. Todos los derechos reservados.**  
+Autor y titular del proyecto: Jhon Zarate.
+
 App estática para registrar las jornadas del año 2027.
 
 ## Funciones
@@ -22,3 +25,18 @@ App estática para registrar las jornadas del año 2027.
 La primera vez que inicies sesión, los meses que existan en el navegador se copian a tu cuenta. Los meses existentes en Supabase se descargan en el navegador. Mantén una copia CSV de los datos importantes.
 
 La tasa de cambio es una referencia pública y puede llevar retraso; no es una cotización bancaria en tiempo real. La sección laboral es orientativa y no sustituye la revisión del convenio, contrato o sistema de registro de la empresa.
+
+
+## Documentación técnica
+
+- `index.html` contiene la interfaz, los estilos responsive, la navegación mensual, la vista de calendario y lista, el formulario diario, los cálculos, gastos y las operaciones de importación/exportación.
+- El selector interno del año se conserva para la lógica de navegación; visualmente el año se presenta junto al mes. Las flechas anterior/siguiente cambian también el año al cruzar diciembre o enero.
+- Las jornadas, tarifas y gastos se guardan con claves separadas por año y mes en `localStorage`. Las observaciones se guardan con cada jornada.
+- El cambio EUR/COP usa la última cotización de referencia disponible de Frankfurter. La fecha de la tasa se muestra en la interfaz.
+- La integración cliente de Supabase se encuentra al final de `index.html`; la tabla y sus políticas están en `supabase/schema.sql`. No debe incluirse una clave secreta en código público.
+- `manifest.webmanifest` y los iconos permiten instalar la app en dispositivos compatibles.
+
+## Autoría y derechos
+
+El proyecto y su código se atribuyen a **Jhon Zarate**. El aviso de copyright identifica la autoría del trabajo; no concede permiso para reutilizar, modificar o redistribuir el código. Para publicar el proyecto con una licencia de software específica, añade una licencia elegida por el titular.
+
