@@ -83,8 +83,8 @@
       .panel-head{display:flex;align-items:stretch;flex-direction:column;padding:13px 12px;gap:12px}
       .panel-head>div{width:100%;min-width:0}
       .panel-head h2{font-size:17px}
-      .ratebox{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:9px;width:100%;padding:11px}
-      .ratebox .rate,.ratebox .rate-note,.ratebox #rateError{grid-column:1;max-width:none;white-space:normal}.ratebox .rate-hour-field{grid-column:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(105px,140px);align-items:center;gap:8px;white-space:normal}.ratebox .rate-hour-field .rate-input{width:100%;min-width:0}
+      .ratebox{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:9px;width:100%;max-width:100%;min-width:0;padding:11px}
+      .ratebox .rate,.ratebox .rate-note,.ratebox #rateError{grid-column:1;max-width:none;white-space:normal;overflow-wrap:anywhere}.ratebox .rate-hour-field{grid-column:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(96px,132px);align-items:center;gap:8px;white-space:normal}.ratebox .rate-hour-field>span{min-width:0;line-height:1.25}.ratebox .rate-hour-field .rate-input{width:100%;min-width:0}
       .ratebox #rateSource{grid-column:1}
       .ratebox button{grid-column:1;justify-self:stretch;width:100%}
       .auth-panel{padding:13px}
