@@ -26,6 +26,7 @@
     .view-toggle{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line)}.view-toggle button{padding:8px 14px}
     .calendar-view{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;padding:12px}.calendar-weekday{text-align:center;padding:5px;color:var(--muted);font-size:12px;font-weight:750}
     .calendar-day{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0;min-height:92px;padding:9px;border:1px solid var(--line);border-radius:11px;background:var(--white);text-align:left;transition:border-color .15s,transform .15s}
+    .calendar-week-total{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;padding:5px 9px;border-bottom:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
     .calendar-day:hover{border-color:var(--accent);transform:translateY(-1px)}.calendar-day-number{font-size:15px;font-weight:800}.calendar-day-detail{font-size:11px;line-height:1.25;color:var(--muted);overflow-wrap:anywhere}.calendar-day.has-hours{border-color:#8db59a;background:#f2faf4}.calendar-day.has-hours .calendar-day-detail{color:#2e6541;font-weight:650}
     .calendar-day.sunday{background:#8ca8c2;border-color:#607e9c;color:#142b43}.calendar-day.sunday .calendar-day-detail{color:#294b6c}.calendar-day.outside{visibility:hidden;pointer-events:none}.calendar-day.has-note .calendar-day-number::after{content:' ·';color:var(--accent)}
     .day-dialog{width:min(420px,calc(100vw - 24px));padding:0;border:1px solid var(--line);border-radius:16px;background:var(--white);color:var(--ink);box-shadow:0 20px 70px #0006}.day-dialog::backdrop{background:#07111dcc}
@@ -43,6 +44,7 @@
     .profile-popover form{display:grid;gap:9px;margin:0;padding:12px}.profile-popover input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink)}.profile-section{margin:9px 0;border:1px solid var(--line);border-radius:10px;background:var(--paper);overflow:hidden}.profile-section>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;font-weight:700;cursor:pointer;list-style:none}.profile-section>summary::-webkit-details-marker{display:none}.profile-section>summary::after{content:'+';font-size:19px;color:var(--muted)}.profile-section[open]>summary::after{content:'−'}.profile-section[open]>summary{border-bottom:1px solid var(--line)}.profile-section .profile-note{padding:0 12px 10px;margin:0}
     .profile-note,.profile-message{font-size:12px;color:var(--muted);margin:8px 0 12px}.profile-message{min-height:18px}.profile-message.error{color:#a12626}.profile-message.ok{color:#25623b}
     .profile-menu[open]>summary{background:#294a67}
+    .admin-section{margin:12px 0;border:1px solid var(--line);border-radius:10px;background:var(--paper);overflow:hidden}.admin-section>summary{padding:11px 12px;font-weight:700;cursor:pointer}.admin-panel{padding:12px}.admin-users{display:grid;gap:10px}.admin-user{padding:11px;border:1px solid var(--line);border-radius:9px;background:var(--white)}.admin-user-head{display:flex;justify-content:space-between;gap:8px;overflow-wrap:anywhere}.admin-user small{color:var(--muted)}.admin-password-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;margin-top:8px}.admin-password-form input{min-width:0;width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--white);color:var(--ink)}.admin-password-form button{padding:8px}
     .expense-form{display:flex;align-items:end;gap:10px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid var(--line)}
     .expense-form input,.expense-form select{min-width:145px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink)}
     .expense-form .description{min-width:190px}.expense-total{font-size:18px;font-weight:750}.expense-delete{padding:5px 9px}
@@ -76,6 +78,7 @@
       .field{min-width:0}.calendar-month-nav{grid-template-columns:44px minmax(0,1fr) auto 44px;width:100%;padding:10px 12px;gap:8px}.calendar-year{padding:0 9px}
       .field select,.rate-input{width:100%;min-width:0}
       .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+      .cards .card:last-child{grid-column:1/-1}
       .card{min-width:0;padding:11px 10px;min-height:80px}
       .card .value{font-size:clamp(16px,5vw,21px);overflow-wrap:anywhere}
       .card .label,.card .sub{overflow-wrap:anywhere}
@@ -91,6 +94,7 @@
       .auth-row{display:grid;grid-template-columns:1fr;align-items:stretch;gap:9px}
       .auth-row .field,.auth-row input{width:100%;min-width:0}
       .auth-row button{width:100%}
+      .calendar-week-total{font-size:10px;padding:4px 3px}
       .calendar-view{gap:4px;padding:8px}.calendar-weekday{font-size:10px;padding:3px 0}.calendar-day{min-height:48px;padding:5px 2px;border-radius:8px;gap:2px;align-items:center;text-align:center}.calendar-day.has-hours{min-height:58px}.calendar-day:not(.has-hours) .calendar-day-detail{display:none}.calendar-day.has-hours .calendar-day-detail{font-size:9px;white-space:nowrap}.calendar-day-number{font-size:13px}.calendar-day-detail{font-size:10px}.view-toggle{padding:10px 12px}.day-dialog form{padding:15px}.day-dialog-actions{display:grid;grid-template-columns:1fr 1fr}.day-dialog-actions button{width:100%}
       .table-wrap{overflow:visible}
       table,table[style]{display:block;width:100%;min-width:0!important;border-spacing:0}
@@ -138,7 +142,7 @@
   <!-- Cabecera y menú de acciones de datos/perfil. -->
   <header>
     <div><h1>Control de jornada</h1><p>Registro mensual de horas · Nufri · 2027</p></div>
-    <div class="actions"><details class="data-menu" id="dataMenu"><summary aria-label="Abrir acciones de datos">Acciones</summary><div class="data-menu-panel" aria-label="Acciones de la jornada"><button id="exportBtn" type="button" title="Descargar el mes seleccionado en CSV">Exportar mes CSV</button><button id="importBtn" type="button" title="Importar jornadas desde un libro Excel de 2026">Importar Excel 2026</button><div class="menu-divider" role="separator"></div><button id="clearBtn" type="button" title="Eliminar los datos del mes seleccionado">Eliminar mes</button><button id="clearYearBtn" type="button" class="danger" title="Eliminar los datos del año seleccionado">Eliminar año</button></div></details><input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+    <div class="actions"><details class="data-menu" id="dataMenu"><summary aria-label="Abrir acciones de datos">Acciones</summary><div class="data-menu-panel" aria-label="Acciones de la jornada"><button id="exportBtn" type="button" title="Descargar el mes seleccionado en CSV">Exportar mes CSV</button><button id="importBtn" type="button" title="Importar jornadas del Excel al año seleccionado">Importar Excel</button><div class="menu-divider" role="separator"></div><button id="clearBtn" type="button" title="Eliminar los datos del mes seleccionado">Eliminar mes</button><button id="clearYearBtn" type="button" class="danger" title="Eliminar los datos del año seleccionado">Eliminar año</button></div></details><input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
       <details class="profile-menu" id="profileMenu">
         <summary id="profileTrigger" aria-label="Iniciar sesión" title="Iniciar sesión">
           <svg class="profile-icon" id="profileFallbackIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.8 20c.6-3.6 3.3-5.5 7.2-5.5s6.6 1.9 7.2 5.5"></path></svg><img id="profileAvatar" class="profile-avatar" alt="Foto de perfil" hidden>
@@ -146,6 +150,7 @@
         <div class="profile-popover">
           <section id="authPanel" class="auth-panel" aria-labelledby="authTitle" hidden>
             <h2 id="authTitle" style="font-size:17px;margin:0 0 8px">Iniciar sesión</h2>
+            <p class="profile-note">Cada persona puede crear su propia cuenta. Sus jornadas quedan separadas y privadas.</p>
             <form id="authForm" class="auth-row">
               <label class="field">Correo electrónico<input id="authEmail" type="email" autocomplete="email" required></label>
               <label class="field">Contraseña<input id="authPassword" type="password" autocomplete="current-password" minlength="8" required></label>
@@ -174,6 +179,7 @@
               </form>
               <p class="profile-note">La contraseña se envía directamente a Supabase Auth y no se guarda en el perfil.</p>
             </details>
+            <details id="adminSection" class="admin-section" hidden><summary>Administrar cuentas</summary><div class="admin-panel"><p class="profile-note">Al cambiar una contraseña, informa al usuario para que la actualice desde su perfil.</p><button id="refreshAdminUsers" type="button">Actualizar lista</button><div id="adminMessage" class="profile-message" role="status" aria-live="polite"></div><div id="adminUsers" class="admin-users"></div></div></details>
             <div id="profileMessage" class="profile-message" role="status" aria-live="polite"></div>
             <button id="signOutBtn" type="button">Cerrar sesión</button>
           </div>
@@ -198,7 +204,7 @@
       <div class="view-toggle" role="group" aria-label="Vista de jornadas"><button id="calendarViewBtn" type="button" class="primary" aria-pressed="true">Calendario</button><button id="listViewBtn" type="button" aria-pressed="false">Lista</button></div><div id="calendarView" class="calendar-view" aria-label="Calendario del mes"></div><div class="table-wrap" id="listView" hidden><table><thead><tr><th scope="col">Fecha</th><th scope="col">Entrada</th><th scope="col">Salida</th><th scope="col">Almuerzo (h)</th><th scope="col">Total (h)</th></tr></thead><tbody id="daysBody"></tbody></table></div>
       <div class="hint">Los domingos están marcados como no laborables. Toca un día para abrir el formulario y registrar o editar la jornada.</div>
     </section>
-    <dialog id="dayDialog" class="day-dialog" aria-labelledby="dayDialogTitle"><form id="dayForm"><div class="day-dialog-head"><div><h2 id="dayDialogTitle">Jornada</h2><p id="dayDialogDate"></p></div><button type="button" id="closeDayDialog" class="icon-close" aria-label="Cerrar">×</button></div><div class="day-time-fields"><label class="field">Entrada<input id="dayEntry" type="time" step="60"></label><label class="field">Salida<input id="dayExit" type="time" step="60"></label></div><label class="field">Almuerzo (horas)<input id="dayLunch" type="number" min="0" max="24" step="0.25" inputmode="decimal" placeholder="Opcional"></label><label class="field">Observaciones<textarea id="dayObservation" maxlength="500" rows="3" placeholder="Añade una nota sobre esta jornada"></textarea></label><div id="dayFormMessage" class="profile-message" role="status" aria-live="polite"></div><div class="day-dialog-actions"><button type="button" id="cancelDayDialog">Cancelar</button><button type="submit" class="primary">Guardar jornada</button></div></form></dialog>
+    <dialog id="dayDialog" class="day-dialog" aria-labelledby="dayDialogTitle"><form id="dayForm"><div class="day-dialog-head"><div><h2 id="dayDialogTitle">Jornada</h2><p id="dayDialogDate"></p></div><button type="button" id="closeDayDialog" class="icon-close" aria-label="Cerrar">×</button></div><div class="day-time-fields"><label class="field">Entrada<input id="dayEntry" type="time" step="60"></label><label class="field">Salida<input id="dayExit" type="time" step="60"></label></div><label class="field">Almuerzo (horas)<input id="dayLunch" type="number" min="0" max="24" step="0.25" inputmode="decimal" placeholder="Opcional"><small class="profile-note">Usa horas decimales: 0,5 equivale a 30 minutos. Se descuenta del total.</small></label><label class="field">Observaciones<textarea id="dayObservation" maxlength="500" rows="3" placeholder="Añade una nota sobre esta jornada"></textarea></label><div id="dayFormMessage" class="profile-message" role="status" aria-live="polite"></div><div class="day-dialog-actions"><button type="button" id="cancelDayDialog">Cancelar</button><button type="submit" class="primary">Guardar jornada</button></div></form></dialog>
     <section class="panel" style="margin-top:18px" aria-labelledby="expenseTitle">
       <div class="panel-head"><div><h2 id="expenseTitle">Gastos del mes</h2><p>Añade mercado, plan celular, ocio, viajes u otros gastos en euros.</p></div><div class="expense-total" id="expenseSummary">Total: 0 €</div></div>
       <form id="expenseForm" class="expense-form">
@@ -251,7 +257,7 @@
       function save(){const data={},previous=read();body.querySelectorAll('tr[data-day]').forEach(tr=>{const v=[...tr.querySelectorAll('input')].map(x=>x.value),observation=(previous[tr.dataset.day]||[])[3]||'';if(v.some(Boolean)||observation)data[tr.dataset.day]=[...v,observation]});try{localStorage.setItem(key(),JSON.stringify(data));status('Guardado en este navegador')}catch{status('No se pudo guardar: almacenamiento lleno')}}
       function workedHours(start,end,lunchValue=''){if(!start||!end)return null;const [ah,am]=start.split(':').map(Number),[bh,bm]=end.split(':').map(Number);if(![ah,am,bh,bm].every(Number.isFinite))return null;let duration=(bh*60+bm-ah*60-am)/60;if(duration<0)duration+=24;const lunch=lunchValue===''?0:Number(lunchValue);return Number.isFinite(lunch)&&lunch>=0&&lunch<=duration?duration-lunch:null}
       // Dibuja el calendario mensual y sus días seleccionables.
-      function renderCalendar(saved,y,m,count){const view=$('calendarView');view.replaceChildren();['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(label=>{const head=document.createElement('div');head.className='calendar-weekday';head.textContent=label;view.append(head)});const firstOffset=(new Date(y,m,1).getDay()+6)%7;for(let i=0;i<firstOffset;i++){const blank=document.createElement('div');blank.className='calendar-day outside';blank.setAttribute('aria-hidden','true');view.append(blank)}for(let d=1;d<=count;d++){const dt=new Date(y,m,d),dow=dt.getDay(),row=saved[String(d)]||['','',''],button=document.createElement('button');button.type='button';button.className='calendar-day'+(dow===0?' sunday':'');button.dataset.day=String(d);const number=document.createElement('span');number.className='calendar-day-number';number.textContent=String(d);const detail=document.createElement('span');detail.className='calendar-day-detail';const [start,end,lunch,observation]=row;const hours=workedHours(start,end,lunch??'');if(hours!==null){button.classList.add('has-hours');detail.textContent=hours.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' h';button.title=start+'–'+end}else if(start&&end)detail.textContent='Revisar almuerzo';else detail.textContent=observation?'Con observación':dow===0?'No laborable':'＋ Añadir jornada';if(observation){button.classList.add('has-note');button.title+=(button.title?' · ':'')+observation}button.setAttribute('aria-label',weekday[dow]+' '+d+' '+months[m]+' '+y+(detail.textContent?' · '+detail.textContent:''));button.append(number,detail);view.append(button)}}
+      function renderCalendar(saved,y,m,count){const view=$('calendarView');view.replaceChildren();['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(label=>{const head=document.createElement('div');head.className='calendar-weekday';head.textContent=label;view.append(head)});const firstOffset=(new Date(y,m,1).getDay()+6)%7;for(let i=0;i<firstOffset;i++){const blank=document.createElement('div');blank.className='calendar-day outside';blank.setAttribute('aria-hidden','true');view.append(blank)}let weekHours=0;for(let d=1;d<=count;d++){const dt=new Date(y,m,d),dow=dt.getDay(),row=saved[String(d)]||['','',''],button=document.createElement('button');button.type='button';button.className='calendar-day'+(dow===0?' sunday':'');button.dataset.day=String(d);const number=document.createElement('span');number.className='calendar-day-number';number.textContent=String(d);const detail=document.createElement('span');detail.className='calendar-day-detail';const [start,end,lunch,observation]=row;const hours=workedHours(start,end,lunch??'');if(hours!==null){button.classList.add('has-hours');weekHours+=hours;detail.textContent=hours.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' h';button.title=start+'–'+end}else if(start&&end)detail.textContent='Revisar almuerzo';else detail.textContent=observation?'Con observación':dow===0?'No laborable':'＋ Añadir jornada';if(observation){button.classList.add('has-note');button.title+=(button.title?' · ':'')+observation}button.setAttribute('aria-label',weekday[dow]+' '+d+' '+months[m]+' '+y+(detail.textContent?' · '+detail.textContent:''));button.append(number,detail);view.append(button);if(dow===0||d===count){const weekly=document.createElement('div');weekly.className='calendar-week-total';weekly.setAttribute('aria-label','Total de la semana');const label=document.createElement('span');label.textContent='Total de la semana';const value=document.createElement('strong');value.textContent=weekHours.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' h';weekly.append(label,value);view.append(weekly);weekHours=0}}}
       // Sincroniza el periodo elegido, resumen, calendario y vista de lista.
       function render(){const y=Number(ys.value),m=Number(ms.value),saved=read(),count=new Date(y,m+1,0).getDate();$('monthTitle').textContent=`${months[m]} ${y}`;$('yearLabel').textContent=String(y);body.replaceChildren();renderCalendar(saved,y,m,count);
         if(!$("listView").hidden)for(let d=1;d<=count;d++){const dt=new Date(y,m,d),dow=dt.getDay(),row=saved[String(d)]||['','',''];const tr=document.createElement('tr');tr.dataset.day=d;if(dow===0)tr.className='sunday';const date=document.createElement('td');date.className='date';date.setAttribute('data-label','Fecha');date.innerHTML=`${weekday[dow].charAt(0).toUpperCase()+weekday[dow].slice(1)} ${String(d).padStart(2,'0')}/${String(m+1).padStart(2,'0')}/${y}${dow===0?'<small><span class="sunday-tag">DOMINGO · NO LABORABLE</span></small>':''}`;tr.append(date);
@@ -259,7 +265,7 @@
           const total=document.createElement('td');total.className='total empty';total.dataset.label='Total';total.textContent='—';tr.append(total);calc(tr);body.append(tr)}
         $('hourlyRate').value=readHourlyRate()??'';renderExpenses();summary()}
       let activeDay=null;const dayDialog=$('dayDialog'),dayForm=$('dayForm');function openDayForm(day){activeDay=Number(day);const y=Number(ys.value),m=Number(ms.value),date=new Date(y,m,activeDay),row=read()[String(activeDay)]||['','',''];$('dayDialogTitle').textContent='Jornada';$('dayDialogDate').textContent=date.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});$('dayEntry').value=row[0]||'';$('dayExit').value=row[1]||'';$('dayLunch').value=row[2]||'';$('dayObservation').value=row[3]||'';$('dayFormMessage').textContent='';if(typeof dayDialog.showModal==='function')dayDialog.showModal();else dayDialog.setAttribute('open','')}
-      $('calendarView').addEventListener('click',event=>{const button=event.target.closest('button[data-day]');if(button)openDayForm(button.dataset.day)});$('calendarViewBtn').addEventListener('click',()=>{$('calendarView').hidden=false;$('listView').hidden=true;$('calendarViewBtn').classList.add('primary');$('listViewBtn').classList.remove('primary');$('calendarViewBtn').setAttribute('aria-pressed','true');$('listViewBtn').setAttribute('aria-pressed','false');render()});$('listViewBtn').addEventListener('click',()=>{$('calendarView').hidden=true;$('listView').hidden=false;$('listViewBtn').classList.add('primary');$('calendarViewBtn').classList.remove('primary');$('listViewBtn').setAttribute('aria-pressed','true');$('calendarViewBtn').setAttribute('aria-pressed','false');render()});$('closeDayDialog').addEventListener('click',()=>dayDialog.close?.());$('cancelDayDialog').addEventListener('click',()=>dayDialog.close?.());dayDialog.addEventListener('click',event=>{if(event.target===dayDialog)dayDialog.close?.()});dayForm.addEventListener('submit',event=>{event.preventDefault();const entry=$('dayEntry').value,exit=$('dayExit').value,lunch=$('dayLunch').value,observation=$('dayObservation').value.trim();if((entry&&!exit)||(!entry&&exit)){ $('dayFormMessage').textContent='Completa Entrada y Salida para registrar el día.';return }if(entry&&exit&&lunch!==''&&Number(lunch)>24){$('dayFormMessage').textContent='El almuerzo no puede superar 24 horas.';return}const data=read();if(entry||exit||lunch||observation)data[String(activeDay)]=[entry,exit,lunch,observation];else delete data[String(activeDay)];localStorage.setItem(key(),JSON.stringify(data));dayDialog.close?.();render();status('Jornada guardada')});
+      $('calendarView').addEventListener('click',event=>{const button=event.target.closest('button[data-day]');if(button)openDayForm(button.dataset.day)});$('calendarViewBtn').addEventListener('click',()=>{$('calendarView').hidden=false;$('listView').hidden=true;$('calendarViewBtn').classList.add('primary');$('listViewBtn').classList.remove('primary');$('calendarViewBtn').setAttribute('aria-pressed','true');$('listViewBtn').setAttribute('aria-pressed','false');render()});$('listViewBtn').addEventListener('click',()=>{$('calendarView').hidden=true;$('listView').hidden=false;$('listViewBtn').classList.add('primary');$('calendarViewBtn').classList.remove('primary');$('listViewBtn').setAttribute('aria-pressed','true');$('calendarViewBtn').setAttribute('aria-pressed','false');render()});$('closeDayDialog').addEventListener('click',()=>dayDialog.close?.());$('cancelDayDialog').addEventListener('click',()=>dayDialog.close?.());dayDialog.addEventListener('click',event=>{if(event.target===dayDialog)dayDialog.close?.()});dayForm.addEventListener('submit',event=>{event.preventDefault();const entry=$('dayEntry').value,exit=$('dayExit').value,lunch=$('dayLunch').value,observation=$('dayObservation').value.trim();if((entry&&!exit)||(!entry&&exit)){ $('dayFormMessage').textContent='Completa Entrada y Salida para registrar el día.';return }if(entry&&exit&&entry===exit){$('dayFormMessage').textContent='La entrada y la salida no pueden ser iguales. Si es un turno nocturno, indica la hora real de salida.';return}if(entry&&exit&&workedHours(entry,exit,lunch)===null){$('dayFormMessage').textContent='El almuerzo no puede superar la duración de la jornada.';return}const data=read();if(entry||exit||lunch||observation)data[String(activeDay)]=[entry,exit,lunch,observation];else delete data[String(activeDay)];localStorage.setItem(key(),JSON.stringify(data));dayDialog.close?.();render();status('Jornada guardada')});
       function calc(tr){const [a,b,l]=[...tr.querySelectorAll('input')].map(x=>x.value);const cell=tr.querySelector('.total');delete cell.dataset.hours;const worked=workedHours(a,b,l);if(worked===null){cell.textContent=!a||!b?'—':'Revisar pausa';cell.classList.add('empty');return}cell.dataset.hours=worked;cell.textContent=`${fmtHours.format(worked)} h`;cell.classList.remove('empty')}
       function summary(){let total=0,days=0;for(const row of Object.values(read())){if(!Array.isArray(row))continue;const value=workedHours(row[0],row[1],row[2]??'');if(value!==null){total+=value;days++}}const wage=Number(readHourlyRate());const gross=Number.isFinite(wage)&&wage>0?total*wage:null;const expenseTotal=readExpenses().reduce((sum,item)=>sum+(Number(item.amount)||0),0);
         $('hoursValue').textContent=`${fmtHours.format(total)} h`;$('daysValue').textContent=`${days} ${days===1?'jornada':'jornadas'}`;
@@ -291,7 +297,7 @@
         });
         return xlsxLoadPromise;
       }
-      function parseExcelImport(workbook,fileName){
+      function parseExcelImport(workbook,fileName,destinationYear){
         const norm=value=>String(value??'').trim().toLocaleLowerCase('es');
         const number=value=>{
           if(typeof value==='number'&&Number.isFinite(value))return value;
@@ -327,7 +333,7 @@
           const dateCol=headers.indexOf('fecha'),entryCol=headers.indexOf('entrada'),exitCol=headers.indexOf('salida'),lunchCol=headers.findIndex(x=>x.startsWith('almuerzo'));
           const days={};let calculatedHours=0;
           for(const row of rows.slice(headerIndex+1)){
-            const date=dateParts(row[dateCol]);if(!date||date.year!==2026||date.month!==month+1)continue;
+            const date=dateParts(row[dateCol]);if(!date||date.month!==month+1)continue;
             const entry=time(row[entryCol]),exit=time(row[exitCol]),lunchValue=number(row[lunchCol]);
             const lunch=lunchValue==null?'':String(lunchValue);
             if(entry&&exit){
@@ -348,14 +354,14 @@
           if(Math.abs(calculatedHours-summaryHours)>0.01)throw new Error(`${sheetName}: las horas de las jornadas no coinciden con el total de la hoja.`);
           const expenses=[];
           for(const [label,category,description,id] of [['Vuelo','Viajes','Vuelo (Excel)','vuelo'],['Mercado','Mercado','Mercado (Excel)','mercado']]){
-            const amount=number(summaryValue(label));if(amount>0)expenses.push({id:`excel-2026-${month}-${id}`,category,description,amount});
+            const amount=number(summaryValue(label));if(amount>0)expenses.push({id:`excel-${destinationYear}-${month}-${id}`,category,description,amount});
           }
           const adjustment=salary==null?0:Number((salary-calculatedHours*rate).toFixed(2));
-          if(adjustment< -0.005)expenses.push({id:`excel-2026-${month}-ajuste`,category:'Otros',description:'Ajuste del sueldo (Excel)',amount:-adjustment});
+          if(adjustment< -0.005)expenses.push({id:`excel-${destinationYear}-${month}-ajuste`,category:'Otros',description:'Ajuste del sueldo (Excel)',amount:-adjustment});
           months[String(month)]={days,hourlyRate:rate,expenses};found++;
         }
-        if(!found)throw new Error('No encontré hojas mensuales de 2026 con columnas Fecha, Entrada, Salida y Almuerzo.');
-        return{year:2026,source:fileName,months};
+        if(!found)throw new Error('No encontré hojas mensuales con columnas Fecha, Entrada, Salida y Almuerzo.');
+        return{year:destinationYear,source:fileName,months};
       }
       $('importBtn').addEventListener('click',()=>{$('importFile').value='';$('importFile').click()});
       $('importFile').addEventListener('change',async()=>{
@@ -364,14 +370,14 @@
         try{
           if(!file.name.toLowerCase().endsWith('.xlsx'))throw new Error('Selecciona el libro Excel en formato .xlsx.');
           await loadXlsx();const workbook=window.XLSX.read(await file.arrayBuffer(),{cellDates:true});
-          const payload=parseExcelImport(workbook,file.name);
+          const destinationYear=Number(ys.value);const payload=parseExcelImport(workbook,file.name,destinationYear);
           const importMonthNumbers=Object.keys(payload.months).map(Number).sort((a,b)=>a-b);
           const plannedDays=Object.values(payload.months).reduce((n,item)=>n+Object.keys(item.days).length,0);
           const plannedExpenses=Object.values(payload.months).reduce((n,item)=>n+item.expenses.length,0);
-          if(!confirm(`Archivo: ${file.name}\nAño destino: 2026\nSe importarán ${importMonthNumbers.length} meses, ${plannedDays} registros diarios y ${plannedExpenses} gastos.\nLas fechas incluidas actualizarán sus datos; los días no incluidos y los demás años se conservarán. ¿Continuar?`))return;
+          if(!confirm(`Archivo: ${file.name}\nAño destino: ${destinationYear}\nSe importarán ${importMonthNumbers.length} meses, ${plannedDays} registros diarios y ${plannedExpenses} gastos.\nLas fechas incluidas actualizarán sus datos; los días no incluidos y los demás años se conservarán. ¿Continuar?`))return;
           let monthCount=0,dayCount=0,expenseCount=0;
           for(const [monthText,monthData] of Object.entries(payload.months)){
-            const month=Number(monthText),maxDay=new Date(2026,month+1,0).getDate(),monthKey=`nufri-jornada-v1-2026-${month}`;
+            const month=Number(monthText),maxDay=new Date(destinationYear,month+1,0).getDate(),monthKey=`nufri-jornada-v1-${destinationYear}-${month}`;
             let saved={};try{saved=JSON.parse(localStorage.getItem(monthKey)||'{}')}catch{}
             for(const [dayText,row] of Object.entries(monthData.days)){
               const day=Number(dayText);
@@ -379,18 +385,18 @@
               saved[String(day)]=[...row,(saved[String(day)]||[])[3]||''];dayCount++;
             }
             localStorage.setItem(monthKey,JSON.stringify(saved));
-            localStorage.setItem(`nufri-settings-v1-hourly-rate-2026-${month}`,JSON.stringify(monthData.hourlyRate));
-            const expKey=`nufri-expenses-v1-2026-${month}`;let expenses=[];try{expenses=JSON.parse(localStorage.getItem(expKey)||'[]')}catch{}
+            localStorage.setItem(`nufri-settings-v1-hourly-rate-${destinationYear}-${month}`,JSON.stringify(monthData.hourlyRate));
+            const expKey=`nufri-expenses-v1-${destinationYear}-${month}`;let expenses=[];try{expenses=JSON.parse(localStorage.getItem(expKey)||'[]')}catch{}
             if(!Array.isArray(expenses))expenses=[];
             const ids=new Set(expenses.map(item=>item.id));
             for(const item of monthData.expenses){if(ids.has(item.id))continue;expenses.push(item);ids.add(item.id);expenseCount++}
             localStorage.setItem(expKey,JSON.stringify(expenses));monthCount++;
           }
-          ys.value='2026';if(!importMonthNumbers.includes(Number(ms.value)))ms.value=String(importMonthNumbers[0]);render();await refresh();
-          $('toast').textContent=`Importación lista: ${monthCount} meses, ${dayCount} jornadas y ${expenseCount} gastos. Se muestra ${months[Number(ms.value)]} 2026.`;
+          ys.value=String(destinationYear);if(!importMonthNumbers.includes(Number(ms.value)))ms.value=String(importMonthNumbers[0]);render();await refresh();
+          $('toast').textContent=`Importación lista: ${monthCount} meses, ${dayCount} jornadas y ${expenseCount} gastos. Se muestra ${months[Number(ms.value)]} ${destinationYear}.`;
           $('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000);
         }catch(error){$('toast').textContent='No se pudo importar: '+error.message;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000)}
-        finally{$('importFile').value='';importButton.disabled=false;importButton.textContent='Importar Excel 2026'}
+        finally{$('importFile').value='';importButton.disabled=false;importButton.textContent='Importar Excel'}
       });
             $('exportBtn').addEventListener('click',exportCSV);const dataMenu=$('dataMenu');dataMenu.addEventListener('click',event=>{if(event.target.closest('button'))dataMenu.open=false});document.addEventListener('click',event=>{if(!dataMenu.contains(event.target))dataMenu.open=false});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&dataMenu.open){dataMenu.open=false;dataMenu.querySelector('summary').focus()}});$('refreshRate').addEventListener('click',refresh);ys.addEventListener('change',render);ms.addEventListener('change',render);
       function storedCounts(year,month=null){let days=0,expenses=0,rates=0;const monthsToRead=month===null?Array.from({length:12},(_,i)=>i):[month];for(const m of monthsToRead){try{const rows=JSON.parse(localStorage.getItem(`nufri-jornada-v1-${year}-${m}`)||'{}');if(rows&&typeof rows==='object')days+=Object.values(rows).filter(row=>Array.isArray(row)&&row.some(value=>value!==''&&value!=null)).length}catch{}try{const list=JSON.parse(localStorage.getItem(`nufri-expenses-v1-${year}-${m}`)||'[]');if(Array.isArray(list))expenses+=list.length}catch{}if(localStorage.getItem(`nufri-settings-v1-hourly-rate-${year}-${m}`)!==null)rates++}return{days,expenses,rates}}
@@ -440,7 +446,7 @@
       const setMessage = (text, kind) => { box.textContent = text; box.className = 'auth-msg' + (kind ? ' ' + kind : ''); };
       const setProfileMessage = (text, kind) => { profileMessage.textContent = text; profileMessage.className = 'profile-message' + (kind ? ' ' + kind : ''); };
       const storage = window.localStorage;
-      const profileAvatarKey = 'nufri-settings-v1-profile-avatar';
+      let profileAvatarKey = 'nufri-settings-v1-profile-avatar';
       function getSavedAvatar() {
         const saved = storage.getItem(profileAvatarKey);
         if (!saved) return null;
@@ -458,6 +464,7 @@
       const originalRemove = storage.removeItem.bind(storage);
       const pending = new Map();
       function showProfile(user) {
+        profileAvatarKey = 'nufri-settings-v1-profile-avatar-' + user.id;
         const fallback = (user?.email || 'Mi perfil').split('@')[0];
         const displayName = String(user?.user_metadata?.display_name || user?.user_metadata?.full_name || fallback);
         document.getElementById('profileDisplayName').value = displayName;
@@ -492,6 +499,16 @@
         }
       };
       async function sync(user) {
+        const ownerKey = 'nufri-storage-owner';
+        const owner = storage.getItem(ownerKey);
+        if (owner && owner !== user.id) {
+          const keys = Array.from({length:storage.length},(_,i)=>storage.key(i)).filter(isAppKey);
+          for (const key of keys) { const value=storage.getItem(key); if (value!==null) originalSet('nufri-isolated-cache:'+owner+':'+key,value); originalRemove(key); }
+        }
+        const cachePrefix = 'nufri-isolated-cache:'+user.id+':';
+        const cached = Array.from({length:storage.length},(_,i)=>storage.key(i)).filter(key=>key&&key.startsWith(cachePrefix));
+        for (const cacheKey of cached) { const key=cacheKey.slice(cachePrefix.length); const value=storage.getItem(cacheKey); if (isAppKey(key)&&value!==null) originalSet(key,value); originalRemove(cacheKey); }
+        originalSet(ownerKey,user.id);
         currentUser = user.id; showProfile(user); setMessage('Sincronizando datos con Supabase…');
         const { data, error } = await db.from('attendance_months').select('storage_key,payload').eq('user_id', user.id);
         if (error) { setMessage('Sesión iniciada, pero no se pudo leer attendance_months: ' + error.message, 'error'); return false; }
@@ -576,14 +593,44 @@
       document.getElementById('signOutBtn').addEventListener('click', async () => {
         const { error } = await db.auth.signOut();
         if (error) { setProfileMessage(error.message, 'error'); return; }
-        currentUser = null; profileMenu.open = false; profileSettings.hidden = true; authPanel.hidden = true; form.hidden = false;
+        currentUser = null; profileMenu.open = false; profileSettings.hidden = true; authPanel.hidden = true; form.hidden = false; renderAvatar(null);
         profileTrigger.setAttribute('aria-label', 'Iniciar sesión');
         profileTrigger.title = 'Iniciar sesión';
         document.getElementById('saveStatus').textContent='Guardado en este navegador'; setMessage('Sesión cerrada. Tus registros permanecen guardados en este navegador.');
       });
+      const adminSection=document.getElementById('adminSection');
+      const adminUsers=document.getElementById('adminUsers');
+      const adminMessage=document.getElementById('adminMessage');
+      async function checkAdmin(load=true) {
+        adminSection.hidden=true;
+        if(!currentUser)return false;
+        const {data,error}=await db.functions.invoke('admin-users',{method:'GET'});
+        if(error||!Array.isArray(data))return false;
+        adminSection.hidden=false;
+        if(load)renderAdminUsers(data);
+        return true;
+      }
+      function renderAdminUsers(users) {
+        adminUsers.replaceChildren();
+        for(const user of users) {
+          const card=document.createElement('article');card.className='admin-user';
+          const head=document.createElement('div');head.className='admin-user-head';
+          const email=document.createElement('strong');email.textContent=user.email||'Sin correo';
+          const name=document.createElement('span');name.textContent=user.display_name||'';head.append(email,name);
+          const created=document.createElement('small');created.textContent='Cuenta creada: '+(user.created_at?new Date(user.created_at).toLocaleDateString('es-ES'):'—');
+          const form=document.createElement('form');form.className='admin-password-form';form.dataset.userId=user.id;
+          const input=document.createElement('input');input.type='password';input.minLength=8;input.required=true;input.autocomplete='new-password';input.placeholder='Nueva contraseña (8+ caracteres)';input.setAttribute('aria-label','Nueva contraseña para '+(user.email||'usuario'));
+          const button=document.createElement('button');button.type='submit';button.textContent='Cambiar';if(user.id===currentUser){const own=document.createElement('small');own.textContent='Tu cuenta: cambia la contraseña en Mi perfil.';card.append(head,created,own)}else{form.append(input,button);card.append(head,created,form)}adminUsers.append(card);
+        }
+        adminMessage.textContent=users.length+' cuentas';adminMessage.className='profile-message';
+      }
+      document.getElementById('refreshAdminUsers').addEventListener('click',async()=>{adminMessage.textContent='Cargando cuentas…';const {data,error}=await db.functions.invoke('admin-users',{method:'GET'});if(error){adminMessage.textContent='No se pudo cargar la lista.';adminMessage.className='profile-message error';return}renderAdminUsers(data||[])});
+      adminUsers.addEventListener('submit',async event=>{const form=event.target.closest('form[data-user-id]');if(!form)return;event.preventDefault();const input=form.querySelector('input'),button=form.querySelector('button');if(input.value.length<8){input.setCustomValidity('Usa al menos 8 caracteres.');input.reportValidity();return}input.setCustomValidity('');button.disabled=true;adminMessage.textContent='Actualizando contraseña…';const {error}=await db.functions.invoke('admin-users',{method:'POST',body:{action:'set-password',userId:form.dataset.userId,password:input.value}});input.value='';button.disabled=false;if(error){adminMessage.textContent='No se pudo cambiar la contraseña. Comprueba la configuración de la función.';adminMessage.className='profile-message error'}else{adminMessage.textContent='Contraseña actualizada. Informa al usuario para que vuelva a iniciar sesión.';adminMessage.className='profile-message ok'}});
+      document.getElementById('adminSection').addEventListener('toggle',event=>{if(event.target.open)checkAdmin(true)});
       db.auth.getSession().then(({data}) => { if (data.session) sync(data.session.user); });
     })();
   </script>
 </body>
 </html>
+
 
