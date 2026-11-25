@@ -19,7 +19,7 @@ Deno.serve(async (request) => {
   if (!url || !serviceKey || !anonKey) return respond({ error: "Falta configurar Supabase" }, 500);
 
   const authorization = request.headers.get("Authorization") || "";
-  const token = authorization.replace(/^Bearer\s+/i, "");
+  const token = authorization.trim().toLowerCase().startsWith("bearer ") ? authorization.trim().slice(7).trim() : authorization.trim();
   if (!token) return respond({ error: "Inicia sesión" }, 401);
 
   const authClient = createClient(url, anonKey, { auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${token}` } } });
@@ -27,7 +27,7 @@ Deno.serve(async (request) => {
   if (authError || !caller) return respond({ error: "Sesión no válida" }, 401);
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
-  const { data: role, error: roleError } = await admin.from("app_admins").select("user_id").eq("user_id", caller.id).maybeSingle();
+  const { data: role, error: roleError } = await authClient.from("app_admins").select("user_id").eq("user_id", caller.id).maybeSingle();
   if (roleError) return respond({ error: "No se pudo comprobar el perfil de administrador" }, 500);
   if (!role) return respond({ error: "Acceso reservado al administrador" }, 403);
 
