@@ -171,7 +171,7 @@
                 <button class="primary" type="submit">Guardar nombre</button>
               </form>
             </details>
-            <details class="profile-section">
+            <details id="changePasswordSection" class="profile-section">
               <summary>Cambiar contraseña</summary>
               <form id="changePasswordForm">
                 <label class="field">Nueva contraseña<input id="newPassword" type="password" minlength="8" autocomplete="new-password" required placeholder="Mínimo 8 caracteres"></label>
@@ -622,7 +622,13 @@
       document.getElementById('refreshAdminUsers').addEventListener('click',async()=>{adminMessage.textContent='Cargando cuentas…';const {data,error}=await db.functions.invoke('admin-users',{method:'GET'});if(error){adminMessage.textContent='No se pudo cargar la lista.';adminMessage.className='profile-message error';return}renderAdminUsers(data||[])});
       adminUsers.addEventListener('submit',async event=>{const form=event.target.closest('form[data-user-id]');if(!form)return;event.preventDefault();const input=form.querySelector('input'),button=form.querySelector('button');if(input.value.length<8){input.setCustomValidity('Usa al menos 8 caracteres.');input.reportValidity();return}input.setCustomValidity('');button.disabled=true;adminMessage.textContent='Actualizando contraseña…';const {error}=await db.functions.invoke('admin-users',{method:'POST',body:{action:'set-password',userId:form.dataset.userId,password:input.value}});input.value='';button.disabled=false;if(error){adminMessage.textContent='No se pudo cambiar la contraseña. Comprueba la configuración de la función.';adminMessage.className='profile-message error'}else{adminMessage.textContent='Contraseña actualizada. Informa al usuario para que vuelva a iniciar sesión.';adminMessage.className='profile-message ok'}});
       document.getElementById('adminSection').addEventListener('toggle',event=>{if(event.target.open)checkAdmin(true)});
-      db.auth.getSession().then(({data}) => { if (data.session) sync(data.session.user); });
+      // Al volver desde el enlace de recuperación, abre el apartado para establecer la nueva clave.
+      const recoveryFlagKey='nufri-password-recovery-user';
+      const recoveryFromUrl=new URLSearchParams(window.location.hash.slice(1)).get('type')==='recovery';
+      const changePasswordSection=document.getElementById('changePasswordSection');
+      function openRecoveryForm(){profileMenu.open=true;profileSettings.hidden=false;authPanel.hidden=true;changePasswordSection.open=true;setProfileMessage('Enlace verificado. Escribe tu contraseña nueva y pulsa «Actualizar contraseña».','ok');setTimeout(()=>changePasswordSection.scrollIntoView({block:'nearest',behavior:'smooth'}),80)}
+      db.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'&&session){sessionStorage.setItem(recoveryFlagKey,session.user.id);if(currentUser===session.user.id)setTimeout(openRecoveryForm,0)}});
+      db.auth.getSession().then(({data})=>{if(data.session){sync(data.session.user).then(()=>{if(recoveryFromUrl||sessionStorage.getItem(recoveryFlagKey)===data.session.user.id){sessionStorage.removeItem(recoveryFlagKey);openRecoveryForm()}})}});
     })();
   </script>
 </body>
