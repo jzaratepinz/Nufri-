@@ -24,7 +24,7 @@ App estática para registrar jornadas, gastos y tarifas por mes. La interfaz se 
 4. Despliega la función privada desde la raíz del repositorio. Si aún no lo has hecho, inicia sesión en Supabase CLI con `supabase login`; luego ejecuta `supabase functions deploy admin-users --project-ref obifekwncoeuhvcnbckk`.
 5. La función lee las variables integradas `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` y `SUPABASE_SECRET_KEYS` (con compatibilidad con las variables legacy `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`). Supabase las proporciona al entorno Edge Functions. **Nunca copies una clave secret/service role a GitHub ni al HTML.**
 
-La lista de cuentas y los cambios de contraseña solo se ofrecen después de verificar el rol en el servidor. Para otra persona, el cambio de contraseña funciona como restablecimiento administrativo; avísale que inicie sesión y la cambie en su perfil. El alta pública depende de que el proveedor Email esté habilitado en Supabase; se recomienda mantener activa la confirmación de correo.
+La Edge Function requiere `verify_jwt = false` en `supabase/config.toml` para aceptar las claves JWT actuales de Supabase; dentro de la función se valida cada sesión con `auth.getUser()` y se comprueba el rol de administrador antes de actuar. Mantén esa validación del servidor. La lista de cuentas y los cambios de contraseña solo se ofrecen después de verificar el rol en el servidor. Para otra persona, el cambio de contraseña funciona como restablecimiento administrativo; avísale que inicie sesión y la cambie en su perfil. El alta pública depende de que el proveedor Email esté habilitado en Supabase; se recomienda mantener activa la confirmación de correo.
 
 ### Aislamiento de datos en el dispositivo
 
