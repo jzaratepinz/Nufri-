@@ -28,9 +28,9 @@
     .profile-menu>summary:hover{background:#294a67}
     .profile-menu>summary:focus-visible{outline:3px solid #70a9d7;outline-offset:3px}
     .profile-icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-    .profile-avatar{width:100%;height:100%;border-radius:50%;object-fit:cover}.avatar-editor{display:grid;grid-template-columns:72px minmax(0,1fr) auto;align-items:end;gap:10px;margin:0 0 16px}.avatar-preview{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--line)}.avatar-editor input{max-width:100%;font-size:12px}.avatar-editor button{padding:8px 10px}
+    .profile-avatar{width:100%;height:100%;border-radius:50%;object-fit:cover}.profile-identity{display:flex;align-items:center;gap:12px;margin:0 0 14px}.profile-avatar-frame{position:relative;flex:0 0 64px;width:64px;height:64px}.avatar-preview,.avatar-placeholder{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--line)}.avatar-placeholder{display:grid;place-items:center;background:var(--paper);color:var(--muted)}.avatar-placeholder .profile-icon{width:30px;height:30px}.profile-identity-copy{min-width:0}.profile-identity-copy h3{margin:0 0 3px;font-size:17px}.profile-visible-name{margin:0;font-weight:700;overflow-wrap:anywhere}.avatar-editor{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:9px;margin:0 0 14px}.avatar-editor input{max-width:100%;font-size:12px}.avatar-editor button{padding:9px 10px}
     .profile-popover{position:absolute;z-index:20;top:calc(100% + 10px);right:0;width:min(340px,calc(100vw - 28px));padding:16px;background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 42px #0004}
-    .profile-popover h3{margin:0 0 12px;font-size:17px}.profile-popover form{display:grid;gap:9px;margin:0 0 16px}.profile-popover input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink)}
+    .profile-popover form{display:grid;gap:9px;margin:0;padding:12px}.profile-popover input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink)}.profile-section{margin:9px 0;border:1px solid var(--line);border-radius:10px;background:var(--paper);overflow:hidden}.profile-section>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;font-weight:700;cursor:pointer;list-style:none}.profile-section>summary::-webkit-details-marker{display:none}.profile-section>summary::after{content:'+';font-size:19px;color:var(--muted)}.profile-section[open]>summary::after{content:'−'}.profile-section[open]>summary{border-bottom:1px solid var(--line)}.profile-section .profile-note{padding:0 12px 10px;margin:0}
     .profile-note,.profile-message{font-size:12px;color:var(--muted);margin:8px 0 12px}.profile-message{min-height:18px}.profile-message.error{color:#a12626}.profile-message.ok{color:#25623b}
     .profile-menu[open]>summary{background:#294a67}
     .expense-form{display:flex;align-items:end;gap:10px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid var(--line)}
@@ -144,17 +144,26 @@
             <div id="authMessage" class="auth-msg" role="status" aria-live="polite">Inicia sesión para sincronizar tus registros entre dispositivos.</div>
           </section>
           <div id="profileSettings" hidden>
-            <h3>Mi perfil</h3>
-            <div class="avatar-editor"><img id="profileAvatarPreview" class="avatar-preview" alt="Vista previa de la foto de perfil" hidden><label class="field">Foto o avatar<input id="profileAvatarInput" type="file" accept="image/*"></label><button id="removeAvatarBtn" type="button">Quitar foto</button></div>
-            <form id="profileForm">
-              <label class="field">Nombre visible<input id="profileDisplayName" type="text" maxlength="60" autocomplete="nickname" required></label>
-              <button class="primary" type="submit">Guardar nombre</button>
-            </form>
-            <form id="changePasswordForm">
-              <label class="field">Nueva contraseña<input id="newPassword" type="password" minlength="8" autocomplete="new-password" required placeholder="Mínimo 8 caracteres"></label>
-              <button type="submit">Cambiar contraseña</button>
-            </form>
-            <p class="profile-note">La contraseña se envía directamente a Supabase Auth y no se guarda en el perfil.</p>
+            <div class="profile-identity">
+              <div class="profile-avatar-frame"><img id="profileAvatarPreview" class="avatar-preview" alt="Foto de perfil" hidden><div id="profileAvatarPlaceholder" class="avatar-placeholder" aria-hidden="true"><svg class="profile-icon" viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.8 20c.6-3.6 3.3-5.5 7.2-5.5s6.6 1.9 7.2 5.5"></path></svg></div></div>
+              <div class="profile-identity-copy"><h3>Mi perfil</h3><p id="profileVisibleName" class="profile-visible-name"></p></div>
+            </div>
+            <div class="avatar-editor"><label class="field">Foto de perfil<input id="profileAvatarInput" type="file" accept="image/*"></label><button id="removeAvatarBtn" type="button">Quitar foto</button></div>
+            <details class="profile-section">
+              <summary>Editar nombre</summary>
+              <form id="profileForm">
+                <label class="field">Nombre visible<input id="profileDisplayName" type="text" maxlength="60" autocomplete="nickname" required></label>
+                <button class="primary" type="submit">Guardar nombre</button>
+              </form>
+            </details>
+            <details class="profile-section">
+              <summary>Cambiar contraseña</summary>
+              <form id="changePasswordForm">
+                <label class="field">Nueva contraseña<input id="newPassword" type="password" minlength="8" autocomplete="new-password" required placeholder="Mínimo 8 caracteres"></label>
+                <button type="submit">Actualizar contraseña</button>
+              </form>
+              <p class="profile-note">La contraseña se envía directamente a Supabase Auth y no se guarda en el perfil.</p>
+            </details>
             <div id="profileMessage" class="profile-message" role="status" aria-live="polite"></div>
             <button id="signOutBtn" type="button">Cerrar sesión</button>
           </div>
@@ -421,8 +430,9 @@
       function renderAvatar(value = getSavedAvatar()) {
         const avatar = document.getElementById('profileAvatar'), preview = document.getElementById('profileAvatarPreview');
         const fallback = document.getElementById('profileFallbackIcon');
-        if (value) { avatar.src = value; avatar.hidden = false; fallback.hidden = true; preview.src = value; preview.hidden = false; }
-        else { avatar.removeAttribute('src'); avatar.hidden = true; fallback.hidden = false; preview.removeAttribute('src'); preview.hidden = true; }
+        const placeholder = document.getElementById('profileAvatarPlaceholder');
+        if (value) { avatar.src = value; avatar.hidden = false; fallback.hidden = true; preview.src = value; preview.hidden = false; if (placeholder) placeholder.hidden = true; }
+        else { avatar.removeAttribute('src'); avatar.hidden = true; fallback.hidden = false; preview.removeAttribute('src'); preview.hidden = true; if (placeholder) placeholder.hidden = false; }
       }
       const originalSet = storage.setItem.bind(storage);
       const originalRemove = storage.removeItem.bind(storage);
@@ -431,6 +441,7 @@
         const fallback = (user?.email || 'Mi perfil').split('@')[0];
         const displayName = String(user?.user_metadata?.display_name || user?.user_metadata?.full_name || fallback);
         document.getElementById('profileDisplayName').value = displayName;
+        document.getElementById('profileVisibleName').textContent = displayName;
         renderAvatar();
         profileMenu.hidden = false;
         profileTrigger.setAttribute('aria-label', 'Abrir ajustes del perfil');
