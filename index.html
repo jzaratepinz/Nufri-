@@ -20,6 +20,26 @@
     .auth-panel{margin-bottom:18px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}.auth-row{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.auth-row input{padding:10px 12px;border:1px solid var(--line);border-radius:9px;min-width:220px}.auth-msg{min-height:20px;color:var(--muted);font-size:13px;margin-top:8px}.auth-msg.error{color:#a12626}.auth-msg.ok{color:#25623b}.auth-session{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
     .legal{margin-top:16px;background:#fff;border:1px solid var(--line);border-left:5px solid #557a9c;border-radius:12px;padding:16px 18px}.legal h2{margin:0 0 8px;font-size:17px}.legal p{margin:7px 0;color:#465b70;font-size:14px}.legal ul{margin:6px 0;padding-left:21px;color:#465b70;font-size:14px}.legal li{margin:5px 0}.legal a{color:#1d5d91;font-weight:650}.legal .caution{color:#76521d;background:#fff6e5;border-radius:8px;padding:9px 11px}
     @media(max-width:700px){header{align-items:flex-start;flex-direction:column;padding:20px}.actions{width:100%}.actions button{flex:1}main{margin:18px auto;padding:0 12px}.cards{grid-template-columns:1fr 1fr;gap:9px}.card{padding:12px;min-height:82px}.card:last-child{grid-column:1/-1}.card .value{font-size:21px}.panel-head{align-items:flex-start;flex-direction:column}.ratebox{align-items:flex-start}.toolbar{gap:10px}.field select{min-width:132px}}
+
+    .rate-input{width:145px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink)}
+    .expense-form{display:flex;align-items:end;gap:10px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid var(--line)}
+    .expense-form input,.expense-form select{min-width:145px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink)}
+    .expense-form .description{min-width:190px}.expense-total{font-size:18px;font-weight:750}.expense-delete{padding:5px 9px}
+    .cards{grid-template-columns:repeat(5,minmax(0,1fr))}
+    @media(prefers-color-scheme:dark){
+      :root{color-scheme:dark;--ink:#e6edf6;--muted:#9caec0;--line:#33465a;--blue:#263c52;--blue-dark:#536d86;--paper:#101923;--white:#172330;--accent:#397cab;--warn:#43351d;--shadow:0 12px 32px #0005}
+      body{background:var(--paper);color:var(--ink)}header{background:#0c151e;color:#f4f7fa}header p{color:#b8c6d4}
+      button{background:#203040;color:#e6edf6;border-color:#455a70}button:hover{background:#2a4054}button.primary{background:#2d6c9e;border-color:#2d6c9e;color:white}
+      .card,.panel,.auth-panel,.legal{background:#172330;border-color:#33465a}.panel-head{border-color:#33465a}
+      .field select,.auth-row input,.expense-form input,.expense-form select,.rate-input{background:#192734;color:#e6edf6;border-color:#40566b}
+      th{background:#243649;color:#d8e5f2;border-color:#40566b}td{border-color:#2a3b4b}
+      input.time,input.lunch{background:#213040;color:#edf3f8;border-color:#50677d}
+      .sunday td{background:#334b61;border-color:#526f89}.sunday .date,.sunday .total{color:#fff}.sunday input{background:#243649}
+      .hint{background:#15212c;border-color:#33465a}.legal p,.legal ul{color:#b7c5d3}.legal a{color:#83b9e4}.legal .caution{background:#3b321f;color:#f0cf8a}
+      .status,.auth-msg{color:#aab9c8}
+    }
+    @media(max-width:980px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:700px){.cards{grid-template-columns:1fr 1fr}.card:last-child{grid-column:auto}.expense-form>*{flex:1 1 145px}.expense-form .description{min-width:145px}}
   </style>
 </head>
 <body>
@@ -27,7 +47,6 @@
     <div><h1>Control de jornada</h1><p>Registro mensual de horas · Nufri · 2027</p></div>
     <div class="actions"><button id="exportBtn" type="button">Exportar CSV</button><button id="clearBtn" type="button">Vaciar mes</button></div>
   </header>
-  <main>
   <main>
     <section class="auth-panel" aria-labelledby="authTitle">
       <h2 id="authTitle" style="font-size:17px;margin:0 0 8px">Sincronizar tus registros</h2>
@@ -42,17 +61,31 @@
     <section class="toolbar" aria-label="Seleccionar periodo">
       <label class="field">Año<select id="yearSelect" aria-label="Año"></select></label>
       <label class="field">Mes<select id="monthSelect" aria-label="Mes"></select></label>
+      <label class="field">Valor de la hora (€)<input id="hourlyRate" class="rate-input" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ej. 10,50" aria-label="Valor de cada hora en euros"></label>
       <span id="saveStatus" class="status" role="status" aria-live="polite"></span>
     </section>
     <section class="cards" aria-label="Resumen del mes">
-      <article class="card"><div class="label">Horas registradas</div><div id="hoursValue" class="value">0,00 h</div><div id="daysValue" class="sub">0 días con jornada completa</div></article>
-      <article class="card"><div class="label">Cotización de referencia</div><div id="rateValue" class="value">Cargando…</div><div id="rateDate" class="sub">EUR → COP</div></article>
-      <article class="card"><div class="label">Equivalencia de 1 EUR</div><div id="copValue" class="value">— COP</div><div class="sub">Referencia informativa, no precio bancario en tiempo real</div></article>
+      <article class="card"><div class="label">Horas trabajadas</div><div id="hoursValue" class="value">0,00 h</div><div id="daysValue" class="sub">0 jornadas</div></article>
+      <article class="card"><div class="label">Valor del trabajo</div><div id="eurWageValue" class="value">— €</div><div class="sub">Según tarifa por hora</div></article>
+      <article class="card"><div class="label">Equivalencia en pesos</div><div id="copWageValue" class="value">— COP</div><div class="sub">Cambio de referencia del mes</div></article>
+      <article class="card"><div class="label">Gastos del mes</div><div id="expensesValue" class="value">0 €</div><div id="expensesCopValue" class="sub">0 COP</div></article>
+      <article class="card"><div class="label">Disponible estimado</div><div id="netEurValue" class="value">— €</div><div id="netCopValue" class="sub">— COP después de gastos</div></article>
     </section>
     <section class="panel">
       <div class="panel-head"><div><h2 id="monthTitle">Jornada</h2><p>Escribe las horas trabajadas. El total aparece cuando Entrada y Salida están completas.</p></div><div class="ratebox"><span id="rateSource" class="rate">Fuente: Frankfurter</span><button id="refreshRate" type="button">Actualizar cotización</button><span id="rateError" class="status" role="status" aria-live="polite"></span></div></div>
       <div class="table-wrap"><table><thead><tr><th scope="col">Fecha</th><th scope="col">Entrada</th><th scope="col">Salida</th><th scope="col">Almuerzo (h)</th><th scope="col">Total (h)</th></tr></thead><tbody id="daysBody"></tbody></table></div>
       <div class="hint">Los domingos están marcados como no laborables y separan las semanas. Las celdas amarillas vacías indican datos pendientes. Si trabajas excepcionalmente un domingo, puedes registrar sus horas.</div>
+    </section>
+    <section class="panel" style="margin-top:18px" aria-labelledby="expenseTitle">
+      <div class="panel-head"><div><h2 id="expenseTitle">Gastos del mes</h2><p>Añade mercado, plan celular, ocio, viajes u otros gastos en euros.</p></div><div class="expense-total" id="expenseSummary">Total: 0 €</div></div>
+      <form id="expenseForm" class="expense-form">
+        <label class="field">Categoría<select id="expenseCategory"><option>Mercado</option><option>Plan celular</option><option>Ocio</option><option>Viajes</option><option>Otros</option></select></label>
+        <label class="field description">Descripción<input id="expenseDescription" type="text" maxlength="80" placeholder="Ej. compra semanal"></label>
+        <label class="field">Valor (€)<input id="expenseAmount" type="number" min="0.01" step="0.01" inputmode="decimal" required placeholder="0,00"></label>
+        <button class="primary" type="submit">Añadir gasto</button>
+      </form>
+      <div class="table-wrap"><table style="min-width:520px"><thead><tr><th>Categoría</th><th>Descripción</th><th>Valor (€)</th><th></th></tr></thead><tbody id="expensesBody"></tbody></table></div>
+      <div class="hint">Los gastos se guardan por mes y se descuentan del valor estimado disponible. Los importes son personales y no modifican el registro de jornada.</div>
     </section>
     <section class="legal" aria-labelledby="legalTitle">
       <h2 id="legalTitle">Referencias laborales · España</h2>
@@ -70,28 +103,47 @@
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script>
-    (()=>{
+    (()=> {
       const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
       const weekday=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
       const fmtHours=new Intl.NumberFormat('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
       const fmtCOP=new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0});
-      const $=id=>document.getElementById(id); const ys=$('yearSelect'), ms=$('monthSelect'), body=$('daysBody');
-      let rate=null, rateDate='', saveTimer;
+      const fmtEUR=new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2});
+      const $=id=>document.getElementById(id), ys=$('yearSelect'), ms=$('monthSelect'), body=$('daysBody'), expensesBody=$('expensesBody');
+      let rate=null, saveTimer;
+      const settingsKey='nufri-settings-v1-hourly-rate';
       for(let y=2026;y<=2035;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===2027)o.selected=true;ys.append(o)}
       months.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m;ms.append(o)});
       const key=()=>`nufri-jornada-v1-${ys.value}-${ms.value}`;
+      const expensesKey=()=>`nufri-expenses-v1-${ys.value}-${ms.value}`;
       const read=()=>{try{return JSON.parse(localStorage.getItem(key())||'{}')}catch{return {}}};
-      function save(){const data={};body.querySelectorAll('tr[data-day]').forEach(tr=>{const v=[...tr.querySelectorAll('input')].map(x=>x.value);if(v.some(Boolean))data[tr.dataset.day]=v});try{localStorage.setItem(key(),JSON.stringify(data));$('saveStatus').textContent='Guardado en este navegador';clearTimeout(saveTimer);saveTimer=setTimeout(()=>$('saveStatus').textContent='',2200)}catch{$('saveStatus').textContent='No se pudo guardar: almacenamiento lleno'}}
-      function render(){const y=Number(ys.value),m=Number(ms.value),saved=read(),count=new Date(y,m+1,0).getDate();$('monthTitle').textContent=`${months[m]} ${y}`;body.replaceChildren();let d0=new Date(y,m,1).getDay();
+      const readExpenses=()=>{try{const v=JSON.parse(localStorage.getItem(expensesKey())||'[]');return Array.isArray(v)?v:[]}catch{return []}};
+      function status(text){$('saveStatus').textContent=text;clearTimeout(saveTimer);if(text)setTimeout(()=>$('saveStatus').textContent='',2400)}
+      function save(){const data={};body.querySelectorAll('tr[data-day]').forEach(tr=>{const v=[...tr.querySelectorAll('input')].map(x=>x.value);if(v.some(Boolean))data[tr.dataset.day]=v});try{localStorage.setItem(key(),JSON.stringify(data));status('Guardado en este navegador')}catch{status('No se pudo guardar: almacenamiento lleno')}}
+      function render(){const y=Number(ys.value),m=Number(ms.value),saved=read(),count=new Date(y,m+1,0).getDate();$('monthTitle').textContent=`${months[m]} ${y}`;body.replaceChildren();
         for(let d=1;d<=count;d++){const dt=new Date(y,m,d),dow=dt.getDay(),row=saved[String(d)]||['','',''];const tr=document.createElement('tr');tr.dataset.day=d;if(dow===0)tr.className='sunday';const date=document.createElement('td');date.className='date';date.innerHTML=`${weekday[dow].charAt(0).toUpperCase()+weekday[dow].slice(1)} ${String(d).padStart(2,'0')}/${String(m+1).padStart(2,'0')}/${y}${dow===0?'<small><span class="sunday-tag">DOMINGO · NO LABORABLE</span></small>':''}`;tr.append(date);
-          ['time','time','number'].forEach((type,i)=>{const td=document.createElement('td'),inp=document.createElement('input');inp.className=i===2?'lunch':'time';inp.type=type;inp.setAttribute('aria-label',`${weekday[dow]} ${d} ${i===0?'entrada':i===1?'salida':'horas de almuerzo'}`);inp.value=row[i]||'';if(type==='time'){inp.step='60'}else{inp.min='0';inp.max='24';inp.step='0.25';inp.placeholder='Opcional'}inp.addEventListener('input',()=>{calc(tr);save()});td.append(inp);tr.append(td)});
-          const total=document.createElement('td');total.className='total empty';total.textContent='—';tr.append(total);calc(tr);body.append(tr)}summary();}
-      function calc(tr){const [a,b,l]=[...tr.querySelectorAll('input')].map(x=>x.value);const cell=tr.querySelector('.total');if(!a||!b){cell.textContent='—';cell.classList.add('empty');return}const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let hours=(bh*60+bm-ah*60-am)/60;if(hours<0)hours+=24;const lunch=l===''?0:Number(l);if(!Number.isFinite(lunch)||lunch<0||lunch>hours){cell.textContent='Revisar pausa';cell.classList.add('empty');return}cell.textContent=`${fmtHours.format(hours-lunch)} h`;cell.classList.remove('empty')}
-      function summary(){let total=0,days=0;body.querySelectorAll('tr').forEach(tr=>{const text=tr.querySelector('.total').textContent;if(text.endsWith(' h')){total+=Number(text.replace(' h','').replace(',','.'));days++}});$('hoursValue').textContent=`${fmtHours.format(total)} h`;$('daysValue').textContent=`${days} ${days===1?'día':'días'} con jornada completa`}
-      async function refresh(){const btn=$('refreshRate');btn.disabled=true;$('rateError').textContent='';$('rateValue').textContent='Consultando…';try{const resp=await fetch('https://api.frankfurter.dev/v2/rate/eur/cop',{cache:'no-store'});if(!resp.ok)throw new Error('La fuente no respondió.');const data=await resp.json();if(typeof data.rate!=='number')throw new Error('La fuente no devolvió una cotización válida.');rate=data.rate;rateDate=data.date||'';$('rateValue').textContent=`1 EUR = ${fmtCOP.format(rate)}`;$('copValue').textContent=fmtCOP.format(rate);$('rateDate').textContent=rateDate?`Fecha de referencia: ${rateDate}`:'EUR → COP';$('rateSource').textContent='Fuente: Frankfurter';}catch(e){$('rateValue').textContent='No disponible';$('rateError').textContent=e.message+' Puedes volver a intentar.';$('copValue').textContent='— COP'}finally{btn.disabled=false}}
-      function exportCSV(){const y=ys.value,m=Number(ms.value),rows=[['Fecha','Entrada','Salida','Almuerzo (h)','Total (h)']];body.querySelectorAll('tr[data-day]').forEach(tr=>{const d=Number(tr.dataset.day),ins=[...tr.querySelectorAll('input')].map(x=>x.value),total=tr.querySelector('.total').textContent;rows.push([`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,...ins,total.endsWith(' h')?total.slice(0,-2).trim():total==='—'?'':total])});const csv='\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(';')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`jornada-nufri-${y}-${String(m+1).padStart(2,'0')}.csv`;a.click();URL.revokeObjectURL(url)}
+          ['time','time','number'].forEach((type,i)=>{const td=document.createElement('td'),inp=document.createElement('input');inp.className=i===2?'lunch':'time';inp.type=type;inp.setAttribute('aria-label',`${weekday[dow]} ${d} ${i===0?'entrada':i===1?'salida':'horas de almuerzo'}`);inp.value=row[i]||'';if(type==='time')inp.step='60';else{inp.min='0';inp.max='24';inp.step='0.25';inp.placeholder='Opcional'}inp.addEventListener('input',()=>{calc(tr);save();summary()});td.append(inp);tr.append(td)});
+          const total=document.createElement('td');total.className='total empty';total.textContent='—';tr.append(total);calc(tr);body.append(tr)}
+        $('hourlyRate').value=localStorage.getItem(settingsKey)||'';renderExpenses();summary()}
+      function calc(tr){const [a,b,l]=[...tr.querySelectorAll('input')].map(x=>x.value);const cell=tr.querySelector('.total');delete cell.dataset.hours;if(!a||!b){cell.textContent='—';cell.classList.add('empty');return}const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let hours=(bh*60+bm-ah*60-am)/60;if(hours<0)hours+=24;const lunch=l===''?0:Number(l);if(!Number.isFinite(lunch)||lunch<0||lunch>hours){cell.textContent='Revisar pausa';cell.classList.add('empty');return}const worked=hours-lunch;cell.dataset.hours=worked;cell.textContent=`${fmtHours.format(worked)} h`;cell.classList.remove('empty')}
+      function summary(){let total=0,days=0;body.querySelectorAll('tr').forEach(tr=>{const value=Number(tr.querySelector('.total').dataset.hours);if(Number.isFinite(value)){total+=value;days++}});const wage=Number(localStorage.getItem(settingsKey));const gross=Number.isFinite(wage)&&wage>0?total*wage:null;const expenseTotal=readExpenses().reduce((sum,item)=>sum+(Number(item.amount)||0),0);
+        $('hoursValue').textContent=`${fmtHours.format(total)} h`;$('daysValue').textContent=`${days} ${days===1?'jornada':'jornadas'}`;
+        $('eurWageValue').textContent=gross===null?'Configura la tarifa':fmtEUR.format(gross);
+        $('copWageValue').textContent=gross===null||rate===null?'— COP':fmtCOP.format(gross*rate);
+        $('expensesValue').textContent=fmtEUR.format(expenseTotal);$('expensesCopValue').textContent=rate===null?'— COP':fmtCOP.format(expenseTotal*rate);
+        $('netEurValue').textContent=gross===null?'— €':fmtEUR.format(gross-expenseTotal);$('netCopValue').textContent=gross===null||rate===null?'— COP después de gastos':fmtCOP.format((gross-expenseTotal)*rate)+' después de gastos';
+      }
+      function renderExpenses(){expensesBody.replaceChildren();const list=readExpenses();for(const item of list){const tr=document.createElement('tr');for(const value of [item.category||'Otros',item.description||'—',fmtEUR.format(Number(item.amount)||0)]){const td=document.createElement('td');td.textContent=value;tr.append(td)}const action=document.createElement('td'),button=document.createElement('button');button.type='button';button.className='expense-delete';button.textContent='Eliminar';button.setAttribute('aria-label','Eliminar gasto');button.addEventListener('click',()=>{const rest=readExpenses().filter(x=>x.id!==item.id);localStorage.setItem(expensesKey(),JSON.stringify(rest));renderExpenses();summary();status('Gasto eliminado')});action.append(button);tr.append(action);expensesBody.append(tr)}$('expenseSummary').textContent='Total: '+fmtEUR.format(list.reduce((sum,x)=>sum+(Number(x.amount)||0),0))}
+      async function refresh(){const btn=$('refreshRate');btn.disabled=true;$('rateError').textContent='';$('rateValue').textContent='Consultando…';try{const resp=await fetch('https://api.frankfurter.dev/v2/rate/eur/cop',{cache:'no-store'});if(!resp.ok)throw new Error('La fuente no respondió.');const data=await resp.json();if(typeof data.rate!=='number')throw new Error('La fuente no devolvió una cotización válida.');rate=data.rate;$('rateValue').textContent=`1 EUR = ${fmtCOP.format(rate)}`;$('copValue').textContent=fmtCOP.format(rate);$('rateDate').textContent=data.date?`Fecha de referencia: ${data.date}`:'EUR → COP';$('rateSource').textContent='Fuente: Frankfurter';summary()}catch(e){$('rateValue').textContent='No disponible';$('rateError').textContent=e.message+' Puedes volver a intentar.';$('copValue').textContent='— COP'}finally{btn.disabled=false}}
+      function exportCSV(){const y=ys.value,m=Number(ms.value),rows=[['Fecha','Entrada','Salida','Almuerzo (h)','Total (h)']];body.querySelectorAll('tr[data-day]').forEach(tr=>{const d=Number(tr.dataset.day),ins=[...tr.querySelectorAll('input')].map(x=>x.value),total=tr.querySelector('.total').textContent;rows.push([`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,...ins,total.endsWith(' h')?total.slice(0,-2).trim():total==='—'?'':total])});
+        rows.push(['','','','',''],['Gastos del mes','','','','']);readExpenses().forEach(x=>rows.push([x.category||'Otros',x.description||'',fmtEUR.format(Number(x.amount)||0),'','']));
+        rows.push(['','','','',''],['Tarifa por hora (EUR)',localStorage.getItem(settingsKey)||'','','',''],['Horas del mes',$('hoursValue').textContent,'','',''],['Valor estimado (EUR)',$('eurWageValue').textContent,'','',''],['Valor estimado (COP)',$('copWageValue').textContent,'','','']);
+        const csv='\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(';')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`nufri-${y}-${String(m+1).padStart(2,'0')}.csv`;a.click();URL.revokeObjectURL(url)}
+      $('expenseForm').addEventListener('submit',event=>{event.preventDefault();const amount=Number($('expenseAmount').value);if(!Number.isFinite(amount)||amount<=0)return;const list=readExpenses();list.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),category:$('expenseCategory').value,description:$('expenseDescription').value.trim(),amount});localStorage.setItem(expensesKey(),JSON.stringify(list));$('expenseDescription').value='';$('expenseAmount').value='';renderExpenses();summary();status('Gasto guardado')});
+      $('hourlyRate').addEventListener('input',()=>{const value=$('hourlyRate').value;if(value===''||Number(value)>=0){localStorage.setItem(settingsKey,value);summary();status('Tarifa guardada')}})
       $('exportBtn').addEventListener('click',exportCSV);$('refreshRate').addEventListener('click',refresh);ys.addEventListener('change',render);ms.addEventListener('change',render);
-      $('clearBtn').addEventListener('click',()=>{if(!confirm(`¿Vaciar Entrada, Salida y Almuerzo de ${months[Number(ms.value)]} ${ys.value}? Esta acción no se puede deshacer.`))return;localStorage.removeItem(key());render();$('toast').textContent='Mes vaciado';$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)});
+      $('clearBtn').addEventListener('click',()=>{if(!confirm(`¿Vaciar jornada y gastos de ${months[Number(ms.value)]} ${ys.value}? Esta acción no se puede deshacer.`))return;localStorage.removeItem(key());localStorage.removeItem(expensesKey());render();$('toast').textContent='Mes vaciado';$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)});
+      const scheme=window.matchMedia('(prefers-color-scheme: dark)');const applyTheme=()=>document.querySelector('meta[name="theme-color"]').content=scheme.matches?'#0c151e':'#172c46';applyTheme();scheme.addEventListener?.('change',applyTheme);
       ms.value='0';render();refresh();
     })();
   </script>
@@ -101,7 +153,8 @@
       const URL = 'https://loiyohgcgcgdjrkrbpgm.supabase.co';
       const KEY = 'sb_publishable_MjcIx-_pVKosFuNzni810Q_0QaMUAUi';
       const db = window.supabase.createClient(URL, KEY);
-      const prefix = 'nufri-jornada-v1-';
+      const prefixes = ['nufri-jornada-v1-', 'nufri-expenses-v1-', 'nufri-settings-v1-'];
+      const isAppKey = key => prefixes.some(prefix => isAppKey(key));
       const box = document.getElementById('authMessage');
       const form = document.getElementById('authForm');
       const panel = document.getElementById('authSession');
@@ -120,7 +173,7 @@
       }
       storage.setItem = function(key, value) {
         originalSet(key, value);
-        if (currentUser && String(key).startsWith(prefix)) {
+        if (currentUser && isAppKey(key)) {
           clearTimeout(pending.get(key));
           const userId = currentUser;
           pending.set(key, setTimeout(() => { pending.delete(key); pushKey(String(key), String(value), userId); }, 600));
@@ -128,7 +181,7 @@
       };
       storage.removeItem = function(key) {
         originalRemove(key);
-        if (currentUser && String(key).startsWith(prefix)) {
+        if (currentUser && isAppKey(key)) {
           const userId = currentUser;
           db.from('attendance_months').delete().eq('user_id', userId).eq('storage_key', String(key))
             .then(({error}) => { if(error) setMessage('No se pudo borrar en Supabase: ' + error.message, 'error'); });
@@ -145,8 +198,9 @@
             originalSet(key, JSON.stringify(payload)); changed = true;
           }
         }
-        for (let i = 0; i <= 9; i++) for (let m = 0; m < 12; m++) {
-          const key = prefix + (2026 + i) + '-' + m;
+        for (let i = 0; i < storage.length; i++) {
+          const key = storage.key(i);
+          if (!isAppKey(key)) continue;
           const local = storage.getItem(key);
           if (local && !remote.has(key)) await pushKey(key, local, userId);
         }
