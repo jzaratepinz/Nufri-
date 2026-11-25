@@ -1,0 +1,23 @@
+{
+  "name": "Temporeros Nufri",
+  "short_name": "Nufri",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#172c46",
+  "theme_color": "#172c46",
+  "icons": [
+    {
+      "src": "./nufri-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./nufri-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
