@@ -528,7 +528,7 @@
       form.addEventListener('submit', async event => {
         event.preventDefault(); setMessage('Iniciando sesión…');
         const { data, error } = await db.auth.signInWithPassword({ email: document.getElementById('authEmail').value.trim(), password: document.getElementById('authPassword').value });
-        if (error) setMessage(error.message, 'error'); else await sync(data.user);
+        if (error) { const invalid = error.message === 'Invalid login credentials'; setMessage(invalid ? 'El correo o la contraseña de Nufri no coinciden. Cuentas moto y Nufri usan cuentas separadas. Si no recuerdas la contraseña de Nufri, toca «Olvidé mi contraseña».' : error.message, 'error'); } else await sync(data.user);
       });
       document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
         const email = document.getElementById('authEmail').value.trim();
