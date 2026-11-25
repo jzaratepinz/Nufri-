@@ -510,8 +510,9 @@
         for (const cacheKey of cached) { const key=cacheKey.slice(cachePrefix.length); const value=storage.getItem(cacheKey); if (isAppKey(key)&&value!==null) originalSet(key,value); originalRemove(cacheKey); }
         originalSet(ownerKey,user.id);
         currentUser = user.id; showProfile(user); setMessage('Sincronizando datos con Supabase…');
+        const adminCheck = checkAdmin();
         const { data, error } = await db.from('attendance_months').select('storage_key,payload').eq('user_id', user.id);
-        if (error) { setMessage('Sesión iniciada, pero no se pudo leer attendance_months: ' + error.message, 'error'); return false; }
+        if (error) { await adminCheck; setMessage('Sesión iniciada, pero no se pudo leer attendance_months: ' + error.message, 'error'); return false; }
         const remote = new Map((data || []).map(row => [row.storage_key, row.payload]));
         let changed = false, failed = 0;
         for (const [key, payload] of remote) { if (!storage.getItem(key) || storage.getItem(key) !== JSON.stringify(payload)) { originalSet(key, JSON.stringify(payload)); changed = true; } }
@@ -521,6 +522,7 @@
         else { setMessage('Sesión iniciada. Los cambios se sincronizan y quedan separados por usuario.', 'ok'); document.getElementById('saveStatus').textContent='Sincronizado con Supabase'; }
         if (changed && !sessionStorage.getItem('nufri-sync-reloaded')) { sessionStorage.setItem('nufri-sync-reloaded', '1'); location.reload(); }
         else sessionStorage.removeItem('nufri-sync-reloaded');
+        await adminCheck;
         return failed === 0;
       }
       form.addEventListener('submit', async event => {
@@ -605,7 +607,8 @@
         adminSection.hidden=true;
         if(!currentUser)return false;
         const {data,error}=await db.functions.invoke('admin-users',{method:'GET'});
-        if(error||!Array.isArray(data))return false;
+        if(error){if(error.context?.status!==403)setProfileMessage('No se pudo comprobar el rol de administrador. Recarga e inicia sesión de nuevo.','error');return false}
+        if(!Array.isArray(data)){setProfileMessage('La respuesta de administración no tiene el formato esperado.','error');return false}
         adminSection.hidden=false;
         if(load)renderAdminUsers(data);
         return true;
