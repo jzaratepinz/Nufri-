@@ -48,7 +48,77 @@
       .status,.auth-msg{color:#aab9c8}
     }
     @media(max-width:980px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
-    @media(max-width:700px){.cards{grid-template-columns:1fr 1fr}.card:last-child{grid-column:auto}.expense-form>*{flex:1 1 145px}.expense-form .description{min-width:145px}}
+    @media(max-width:700px){
+      html,body{max-width:100%;overflow-x:hidden}
+      header{padding:16px 14px;gap:14px}
+      header>div:first-child{width:100%}
+      header h1{font-size:24px}
+      .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px}
+      .actions>button,.actions>.profile-menu{width:100%;min-width:0}
+      .actions>.profile-menu{grid-column:1/-1}
+      .profile-menu>summary{width:100%}
+      .profile-popover{position:fixed;top:auto;right:12px;left:12px;bottom:12px;width:auto;max-height:80dvh;overflow:auto}
+      main{width:100%;max-width:100%;margin:14px auto;padding:0 10px}
+      .toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:10px}
+      .field,.toolbar>.field{min-width:0}
+      .field select,.rate-input{width:100%;min-width:0}
+      #saveStatus{grid-column:1/-1}
+      .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+      .card{min-width:0;padding:11px 10px;min-height:80px}
+      .card .value{font-size:clamp(16px,5vw,21px);overflow-wrap:anywhere}
+      .card .label,.card .sub{overflow-wrap:anywhere}
+      .panel{min-width:0}
+      .panel-head{padding:13px 12px;gap:10px}
+      .panel-head>div{width:100%;min-width:0}
+      .panel-head h2{font-size:17px}
+      .ratebox{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;width:100%}
+      .ratebox .rate,.ratebox .rate-note,.ratebox #rateError{max-width:none;white-space:normal}
+      .ratebox #rateSource{grid-column:1/-1}
+      .ratebox button{grid-column:1/-1;width:100%}
+      .auth-panel{padding:13px}
+      .auth-row{display:grid;grid-template-columns:1fr;align-items:stretch;gap:9px}
+      .auth-row .field,.auth-row input{width:100%;min-width:0}
+      .auth-row button{width:100%}
+      .table-wrap{overflow:visible}
+      table,table[style]{display:block;width:100%;min-width:0!important;border-spacing:0}
+      thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+      tbody{display:grid;gap:9px;padding:9px}
+      tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 9px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--white);box-shadow:0 3px 10px #172c4610}
+      tbody td{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;padding:7px 2px;border:0!important;background:transparent!important}
+      tbody td::before{content:attr(data-label);flex:0 0 auto;color:var(--muted);font-size:12px;font-weight:700}
+      tbody td.date{grid-column:1/-1;display:block;padding:0 0 8px;margin-bottom:4px;border-bottom:1px solid var(--line)!important;font-size:14px;white-space:normal}
+      tbody td.date::before{content:none}
+      tbody td.date small{margin-top:3px}
+      tbody td input.time,tbody td input.lunch{width:100%;max-width:none;min-width:0;padding:8px 5px;font-size:16px}
+      tbody td.total{grid-column:1/-1;justify-content:flex-end;min-height:32px;padding-top:8px;border-top:1px solid var(--line)!important}
+      tbody td.total::before{margin-right:auto}
+      tr.sunday{border:2px solid #385a78;background:#8ca8c2}
+      tr.sunday td.date{color:#142b43;border-bottom-color:#6e8ba7!important}
+      tr.sunday td::before{color:#203e5b}
+      tr.sunday td.total{color:#142b43;border-top-color:#6e8ba7!important}
+      tr.sunday td input{background:#eaf0f6;color:#172c46}
+      #expensesBody tr{grid-template-columns:1fr 1fr}
+      #expensesBody td:last-child{grid-column:1/-1;justify-content:flex-end}
+      #expensesBody td:last-child::before{content:none}
+      .expense-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px}
+      .expense-form>*{width:100%;min-width:0}
+      .expense-form .description{grid-column:1/-1;min-width:0}
+      .expense-form input,.expense-form select{width:100%;min-width:0}
+      .expense-form button{grid-column:1/-1}
+      .hint{padding:11px 12px;font-size:13px}
+      .legal{padding:13px}
+      .footer{padding:0 2px}
+      .toast{right:10px;bottom:10px;max-width:calc(100vw - 20px)}
+    }
+    @media(max-width:360px){
+      main{padding:0 7px}
+      .cards{gap:6px}
+      .card{padding:9px 7px}
+      .card .value{font-size:16px}
+      .toolbar{gap:8px}
+      tbody{padding:7px}
+      tbody tr{gap:0 6px;padding:8px}
+    }
   </style>
 </head>
 <body>
@@ -150,9 +220,9 @@
       function status(text){$('saveStatus').textContent=text;clearTimeout(saveTimer);if(text)setTimeout(()=>$('saveStatus').textContent='',2400)}
       function save(){const data={};body.querySelectorAll('tr[data-day]').forEach(tr=>{const v=[...tr.querySelectorAll('input')].map(x=>x.value);if(v.some(Boolean))data[tr.dataset.day]=v});try{localStorage.setItem(key(),JSON.stringify(data));status('Guardado en este navegador')}catch{status('No se pudo guardar: almacenamiento lleno')}}
       function render(){const y=Number(ys.value),m=Number(ms.value),saved=read(),count=new Date(y,m+1,0).getDate();$('monthTitle').textContent=`${months[m]} ${y}`;body.replaceChildren();
-        for(let d=1;d<=count;d++){const dt=new Date(y,m,d),dow=dt.getDay(),row=saved[String(d)]||['','',''];const tr=document.createElement('tr');tr.dataset.day=d;if(dow===0)tr.className='sunday';const date=document.createElement('td');date.className='date';date.innerHTML=`${weekday[dow].charAt(0).toUpperCase()+weekday[dow].slice(1)} ${String(d).padStart(2,'0')}/${String(m+1).padStart(2,'0')}/${y}${dow===0?'<small><span class="sunday-tag">DOMINGO · NO LABORABLE</span></small>':''}`;tr.append(date);
-          ['time','time','number'].forEach((type,i)=>{const td=document.createElement('td'),inp=document.createElement('input');inp.className=i===2?'lunch':'time';inp.type=type;inp.setAttribute('aria-label',`${weekday[dow]} ${d} ${i===0?'entrada':i===1?'salida':'horas de almuerzo'}`);inp.value=row[i]||'';if(type==='time')inp.step='60';else{inp.min='0';inp.max='24';inp.step='0.25';inp.placeholder='Opcional'}inp.addEventListener('input',()=>{calc(tr);save();summary()});td.append(inp);tr.append(td)});
-          const total=document.createElement('td');total.className='total empty';total.textContent='—';tr.append(total);calc(tr);body.append(tr)}
+        for(let d=1;d<=count;d++){const dt=new Date(y,m,d),dow=dt.getDay(),row=saved[String(d)]||['','',''];const tr=document.createElement('tr');tr.dataset.day=d;if(dow===0)tr.className='sunday';const date=document.createElement('td');date.className='date';date.setAttribute('data-label','Fecha');date.innerHTML=`${weekday[dow].charAt(0).toUpperCase()+weekday[dow].slice(1)} ${String(d).padStart(2,'0')}/${String(m+1).padStart(2,'0')}/${y}${dow===0?'<small><span class="sunday-tag">DOMINGO · NO LABORABLE</span></small>':''}`;tr.append(date);
+          ['time','time','number'].forEach((type,i)=>{const td=document.createElement('td'),inp=document.createElement('input');td.dataset.label=i===0?'Entrada':i===1?'Salida':'Almuerzo';inp.className=i===2?'lunch':'time';inp.type=type;inp.setAttribute('aria-label',`${weekday[dow]} ${d} ${i===0?'entrada':i===1?'salida':'horas de almuerzo'}`);inp.value=row[i]||'';if(type==='time')inp.step='60';else{inp.min='0';inp.max='24';inp.step='0.25';inp.placeholder='Opcional'}inp.addEventListener('input',()=>{calc(tr);save();summary()});td.append(inp);tr.append(td)});
+          const total=document.createElement('td');total.className='total empty';total.dataset.label='Total';total.textContent='—';tr.append(total);calc(tr);body.append(tr)}
         $('hourlyRate').value=readHourlyRate()??'';renderExpenses();summary()}
       function calc(tr){const [a,b,l]=[...tr.querySelectorAll('input')].map(x=>x.value);const cell=tr.querySelector('.total');delete cell.dataset.hours;if(!a||!b){cell.textContent='—';cell.classList.add('empty');return}const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let hours=(bh*60+bm-ah*60-am)/60;if(hours<0)hours+=24;const lunch=l===''?0:Number(l);if(!Number.isFinite(lunch)||lunch<0||lunch>hours){cell.textContent='Revisar pausa';cell.classList.add('empty');return}const worked=hours-lunch;cell.dataset.hours=worked;cell.textContent=`${fmtHours.format(worked)} h`;cell.classList.remove('empty')}
       function summary(){let total=0,days=0;body.querySelectorAll('tr').forEach(tr=>{const value=Number(tr.querySelector('.total').dataset.hours);if(Number.isFinite(value)){total+=value;days++}});const wage=Number(readHourlyRate());const gross=Number.isFinite(wage)&&wage>0?total*wage:null;const expenseTotal=readExpenses().reduce((sum,item)=>sum+(Number(item.amount)||0),0);
@@ -162,7 +232,7 @@
         $('expensesValue').textContent=fmtEUR.format(expenseTotal);$('expensesCopValue').textContent=rate===null?'— COP':fmtCOP.format(expenseTotal*rate);
         $('netEurValue').textContent=gross===null?'— €':fmtEUR.format(gross-expenseTotal);$('netCopValue').textContent=gross===null||rate===null?'— COP después de gastos':fmtCOP.format((gross-expenseTotal)*rate)+' después de gastos';
       }
-      function renderExpenses(){expensesBody.replaceChildren();const list=readExpenses();for(const item of list){const tr=document.createElement('tr');for(const value of [item.category||'Otros',item.description||'—',fmtEUR.format(Number(item.amount)||0)]){const td=document.createElement('td');td.textContent=value;tr.append(td)}const action=document.createElement('td'),button=document.createElement('button');button.type='button';button.className='expense-delete';button.textContent='Eliminar';button.setAttribute('aria-label','Eliminar gasto');button.addEventListener('click',()=>{const rest=readExpenses().filter(x=>x.id!==item.id);localStorage.setItem(expensesKey(),JSON.stringify(rest));renderExpenses();summary();status('Gasto eliminado')});action.append(button);tr.append(action);expensesBody.append(tr)}$('expenseSummary').textContent='Total: '+fmtEUR.format(list.reduce((sum,x)=>sum+(Number(x.amount)||0),0))}
+      function renderExpenses(){expensesBody.replaceChildren();const list=readExpenses();for(const item of list){const tr=document.createElement('tr');for(const value of [item.category||'Otros',item.description||'—',fmtEUR.format(Number(item.amount)||0)]){const td=document.createElement('td');td.dataset.label=['Categoría','Descripción','Importe'][tr.children.length];td.textContent=value;tr.append(td)}const action=document.createElement('td');action.dataset.label='Acción';const button=document.createElement('button');button.type='button';button.className='expense-delete';button.textContent='Eliminar';button.setAttribute('aria-label','Eliminar gasto');button.addEventListener('click',()=>{const rest=readExpenses().filter(x=>x.id!==item.id);localStorage.setItem(expensesKey(),JSON.stringify(rest));renderExpenses();summary();status('Gasto eliminado')});action.append(button);tr.append(action);expensesBody.append(tr)}$('expenseSummary').textContent='Total: '+fmtEUR.format(list.reduce((sum,x)=>sum+(Number(x.amount)||0),0))}
       async function refresh(){const btn=$('refreshRate');btn.disabled=true;$('rateError').textContent='';$('rateValue').textContent='Consultando…';try{const resp=await fetch('https://api.frankfurter.dev/v2/rate/eur/cop',{cache:'no-store'});if(!resp.ok)throw new Error('La fuente no respondió.');const data=await resp.json();if(typeof data.rate!=='number')throw new Error('La fuente no devolvió una cotización válida.');rate=data.rate;$('rateValue').textContent=`1 EUR = ${fmtCOP.format(rate)}`;$('rateDate').textContent=data.date?`Fecha de referencia: ${data.date}`:'EUR → COP';$('rateSource').textContent='Fuente: Frankfurter';summary()}catch(e){$('rateValue').textContent='No disponible';$('rateError').textContent=e.message+' Puedes volver a intentar.'}finally{btn.disabled=false}}
       function exportCSV(){const y=ys.value,m=Number(ms.value),rows=[['Fecha','Entrada','Salida','Almuerzo (h)','Total (h)']];body.querySelectorAll('tr[data-day]').forEach(tr=>{const d=Number(tr.dataset.day),ins=[...tr.querySelectorAll('input')].map(x=>x.value),total=tr.querySelector('.total').textContent;rows.push([`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,...ins,total.endsWith(' h')?total.slice(0,-2).trim():total==='—'?'':total])});
         rows.push(['','','','',''],['Gastos del mes','','','','']);readExpenses().forEach(x=>rows.push([x.category||'Otros',x.description||'',fmtEUR.format(Number(x.amount)||0),'','']));
