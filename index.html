@@ -13,7 +13,7 @@
     :root{color-scheme:light;--ink:#172c46;--muted:#617086;--line:#d8e0e9;--blue:#dce9f5;--blue-dark:#9db7d1;--paper:#f3f6fa;--white:#fff;--accent:#1d5d91;--warn:#fff0d2;--shadow:0 12px 32px #172c4612}
     *{box-sizing:border-box}*[hidden]{display:none!important}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
     header{background:var(--ink);color:white;padding:24px max(20px,calc((100vw - 1280px)/2));display:flex;align-items:center;justify-content:space-between;gap:20px}header h1{font-size:clamp(22px,3vw,30px);line-height:1.15;margin:0 0 5px}header p{margin:0;color:#c3d1e1;font-size:14px}.actions{display:flex;gap:9px;flex-wrap:wrap}
-    button,select,input{font:inherit}button{border:1px solid #b8c6d5;border-radius:10px;background:white;color:var(--ink);padding:10px 14px;font-weight:650;cursor:pointer}button:hover{background:#edf4fb}button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #70a9d7;outline-offset:2px}
+    button,select,input{font:inherit}button{border:1px solid #b8c6d5;border-radius:10px;background:white;color:var(--ink);padding:10px 14px;font-weight:650;cursor:pointer}button:hover{background:#edf4fb}button.danger{border-color:#c87979;color:#8f2222}button.danger:hover{background:#fff0f0}button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #70a9d7;outline-offset:2px}
     main{max-width:1280px;margin:26px auto;padding:0 20px}.toolbar{display:flex;align-items:end;gap:14px;flex-wrap:wrap;margin-bottom:18px}.field{display:grid;gap:6px;color:var(--muted);font-size:14px;font-weight:650}.field select{min-width:140px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink)}
     .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}.card{background:white;border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);min-height:92px}.card .label{color:var(--muted);font-size:13px;font-weight:650}.card .value{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-top:4px}.card .sub{font-size:13px;color:var(--muted);margin-top:2px}
     .panel{background:white;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid var(--line)}.panel-head h2{font-size:18px;margin:0}.panel-head p{margin:3px 0 0;color:var(--muted);font-size:14px}.ratebox{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.rate{font-weight:750;white-space:nowrap}.rate-note{color:var(--muted);font-size:12px;max-width:200px}.table-wrap{overflow:auto}table{width:100%;border-collapse:separate;border-spacing:0;min-width:680px}th{background:#eaf0f6;color:#334b66;text-align:left;font-size:14px;padding:11px 14px;position:sticky;top:0;z-index:1;border-bottom:1px solid #cad5e1}td{padding:7px 12px;border-bottom:1px solid #e7edf3}th:first-child,td:first-child{padding-left:18px}td.date{font-weight:600;white-space:nowrap}td.date small{display:block;color:var(--muted);font-size:12px;font-weight:500}input.time,input.lunch{width:100%;max-width:150px;border:1px solid #c7d3df;border-radius:8px;padding:9px 10px;color:var(--ink);background:#fffdf3}input.lunch{max-width:126px;text-align:right}input::placeholder{color:#8795a4}.total{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}.empty{color:#8a98a7;font-weight:500}.sunday td{background:#9db7d1;border-color:#7896b3}.sunday td:first-child{border-left:4px solid #3b5d7e}.sunday td:last-child{border-bottom:3px solid #385a78}.sunday .date,.sunday .total{color:#142b43}.sunday input{background:#eaf0f6}.sunday-tag{display:inline-block;color:#294b6c;font-size:11px;font-weight:750;letter-spacing:.02em}.hint{padding:13px 18px;color:var(--muted);font-size:13px;background:#f9fbfd;border-top:1px solid var(--line)}.status{min-height:20px;color:var(--muted);font-size:13px}.footer{margin:14px 2px 32px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}.toast{position:fixed;right:20px;bottom:20px;background:var(--ink);color:#fff;padding:12px 16px;border-radius:10px;box-shadow:var(--shadow);display:none;max-width:min(420px,calc(100vw - 40px))}
@@ -39,7 +39,7 @@
     @media(prefers-color-scheme:dark){
       :root{color-scheme:dark;--ink:#e6edf6;--muted:#9caec0;--line:#33465a;--blue:#263c52;--blue-dark:#536d86;--paper:#101923;--white:#172330;--accent:#397cab;--warn:#43351d;--shadow:0 12px 32px #0005}
       body{background:var(--paper);color:var(--ink)}header{background:#0c151e;color:#f4f7fa}header p{color:#b8c6d4}
-      button{background:#203040;color:#e6edf6;border-color:#455a70}button:hover{background:#2a4054}button.primary{background:#2d6c9e;border-color:#2d6c9e;color:white}
+      button{background:#203040;color:#e6edf6;border-color:#455a70}button:hover{background:#2a4054}button.danger{border-color:#a65c66;color:#ffd4d8}button.danger:hover{background:#42272d}button.primary{background:#2d6c9e;border-color:#2d6c9e;color:white}
       .card,.panel,.auth-panel,.legal{background:#172330;border-color:#33465a}.panel-head{border-color:#33465a}
       .field select,.auth-row input,.expense-form input,.expense-form select,.rate-input{background:#192734;color:#e6edf6;border-color:#40566b}
       th{background:#243649;color:#d8e5f2;border-color:#40566b}td{border-color:#2a3b4b}
@@ -126,7 +126,7 @@
 <body>
   <header>
     <div><h1>Control de jornada</h1><p>Registro mensual de horas · Nufri · 2027</p></div>
-    <div class="actions"><button id="exportBtn" type="button">Exportar CSV</button><button id="importBtn" type="button">Importar</button><input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden><button id="clearBtn" type="button">Vaciar mes</button>
+    <div class="actions"><button id="exportBtn" type="button">Exportar CSV</button><button id="importBtn" type="button">Importar</button><input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden><button id="clearBtn" type="button">Vaciar mes</button><button id="clearYearBtn" type="button" class="danger">Vaciar año seleccionado</button>
       <details class="profile-menu" id="profileMenu">
         <summary id="profileTrigger" aria-label="Iniciar sesión" title="Iniciar sesión">
           <svg class="profile-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.8 20c.6-3.6 3.3-5.5 7.2-5.5s6.6 1.9 7.2 5.5"></path></svg>
@@ -357,6 +357,19 @@
       });
             $('exportBtn').addEventListener('click',exportCSV);$('refreshRate').addEventListener('click',refresh);ys.addEventListener('change',render);ms.addEventListener('change',render);
       $('clearBtn').addEventListener('click',()=>{if(!confirm(`¿Vaciar jornada y gastos de ${months[Number(ms.value)]} ${ys.value}? Esta acción no se puede deshacer.`))return;localStorage.removeItem(key());localStorage.removeItem(expensesKey());render();$('toast').textContent='Mes vaciado';$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)});
+      $('clearYearBtn').addEventListener('click',()=>{
+        const year=Number(ys.value);
+        if(!Number.isInteger(year))return;
+        if(!confirm(`¿Borrar jornadas, gastos y tarifas de todos los meses de ${year}? Se conservarán los datos de los demás años.`))return;
+        for(let month=0;month<12;month++){
+          localStorage.removeItem(`nufri-jornada-v1-${year}-${month}`);
+          localStorage.removeItem(`nufri-expenses-v1-${year}-${month}`);
+          localStorage.removeItem(`nufri-settings-v1-hourly-rate-${year}-${month}`);
+        }
+        render();
+        $('toast').textContent=currentUser?'Año '+year+' vaciado en este navegador y sincronizando con tu cuenta.':'Año '+year+' vaciado en este navegador. Inicia sesión para borrar también la copia de Supabase.';
+        $('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000);
+      });
       const scheme=window.matchMedia('(prefers-color-scheme: dark)');const applyTheme=()=>document.querySelector('meta[name="theme-color"]').content=scheme.matches?'#0c151e':'#172c46';applyTheme();scheme.addEventListener?.('change',applyTheme);
       ms.value='0';render();refresh();
     })();
