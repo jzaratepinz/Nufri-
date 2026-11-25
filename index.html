@@ -367,7 +367,7 @@
             $('exportBtn').addEventListener('click',exportCSV);$('refreshRate').addEventListener('click',refresh);ys.addEventListener('change',render);ms.addEventListener('change',render);
       function storedCounts(year,month=null){let days=0,expenses=0,rates=0;const monthsToRead=month===null?Array.from({length:12},(_,i)=>i):[month];for(const m of monthsToRead){try{const rows=JSON.parse(localStorage.getItem(`nufri-jornada-v1-${year}-${m}`)||'{}');if(rows&&typeof rows==='object')days+=Object.values(rows).filter(row=>Array.isArray(row)&&row.some(value=>value!==''&&value!=null)).length}catch{}try{const list=JSON.parse(localStorage.getItem(`nufri-expenses-v1-${year}-${m}`)||'[]');if(Array.isArray(list))expenses+=list.length}catch{}if(localStorage.getItem(`nufri-settings-v1-hourly-rate-${year}-${m}`)!==null)rates++}return{days,expenses,rates}}
       function showActionToast(message){$('toast').textContent=message;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',4500)}
-      $('clearBtn').addEventListener('click',()=>{const year=Number(ys.value),month=Number(ms.value),label=`${months[month]} ${year}`,count=storedCounts(year,month);if(!count.days&&!count.expenses&&!count.rates){showActionToast(`${label} ya está vacío.`);return}if(!confirm(`Eliminar ${label}?\n${count.days} registros diarios, ${count.expenses} gastos y ${count.rates} tarifa(s) por hora.\nEsta acción no se puede deshacer.`))return;localStorage.removeItem(key());localStorage.removeItem(expensesKey());localStorage.removeItem(hourlyRateKey());render();showActionToast(`${label} eliminado${currentUser?' y sincronizando con tu cuenta.':'. Solo se borró en este navegador; inicia sesión para quitar la copia de Supabase.'}`)});
+      $('clearBtn').addEventListener('click',()=>{const year=Number(ys.value),month=Number(ms.value),label=`${months[month]} ${year}`,count=storedCounts(year,month);if(!count.days&&!count.expenses&&!count.rates){showActionToast(`${label} ya está vacío.`);return}if(!confirm(`Eliminar ${label}?\n${count.days} registros diarios, ${count.expenses} gastos y ${count.rates} tarifa(s) por hora.\nEsta acción no se puede deshacer.`))return;localStorage.removeItem(key());localStorage.removeItem(expensesKey());localStorage.removeItem(hourlyRateKey());render();showActionToast(`${label} eliminado. Si tienes la sesión iniciada, el cambio también se sincronizará con Supabase.`)});
       $('clearYearBtn').addEventListener('click',()=>{
         const year=Number(ys.value);
         if(!Number.isInteger(year))return;
@@ -380,8 +380,7 @@
           localStorage.removeItem(`nufri-settings-v1-hourly-rate-${year}-${month}`);
         }
         render();
-        $('toast').textContent=currentUser?'Año '+year+' vaciado en este navegador y sincronizando con tu cuenta.':'Año '+year+' vaciado en este navegador. Inicia sesión para borrar también la copia de Supabase.';
-        $('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000);
+        showActionToast(`Año ${year} eliminado. Si tienes la sesión iniciada, el cambio también se sincronizará con Supabase.`);
       });
       const scheme=window.matchMedia('(prefers-color-scheme: dark)');const applyTheme=()=>document.querySelector('meta[name="theme-color"]').content=scheme.matches?'#0c151e':'#172c46';applyTheme();scheme.addEventListener?.('change',applyTheme);
       ms.value='0';render();refresh();
