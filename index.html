@@ -350,7 +350,7 @@
             for(const item of monthData.expenses){if(ids.has(item.id))continue;expenses.push(item);ids.add(item.id);expenseCount++}
             localStorage.setItem(expKey,JSON.stringify(expenses));monthCount++;
           }
-          $('importFile').value='';if(Number(ys.value)===2026)render();
+          $('importFile').value='';await refresh();if(Number(ys.value)===2026)render();
           $('toast').textContent=`Importación lista: ${monthCount} meses, ${dayCount} jornadas y ${expenseCount} gastos.`;
           $('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000);
         }catch(error){$('toast').textContent='No se pudo importar: '+error.message;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000)}
