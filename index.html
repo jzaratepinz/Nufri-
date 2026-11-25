@@ -11,7 +11,7 @@
   <title>Jornada Nufri · 2027</title>
   <style>
     :root{color-scheme:light;--ink:#172c46;--muted:#617086;--line:#d8e0e9;--blue:#dce9f5;--blue-dark:#9db7d1;--paper:#f3f6fa;--white:#fff;--accent:#1d5d91;--warn:#fff0d2;--shadow:0 12px 32px #172c4612}
-    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}*[hidden]{display:none!important}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
     header{background:var(--ink);color:white;padding:24px max(20px,calc((100vw - 1280px)/2));display:flex;align-items:center;justify-content:space-between;gap:20px}header h1{font-size:clamp(22px,3vw,30px);line-height:1.15;margin:0 0 5px}header p{margin:0;color:#c3d1e1;font-size:14px}.actions{display:flex;gap:9px;flex-wrap:wrap}
     button,select,input{font:inherit}button{border:1px solid #b8c6d5;border-radius:10px;background:white;color:var(--ink);padding:10px 14px;font-weight:650;cursor:pointer}button:hover{background:#edf4fb}button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #70a9d7;outline-offset:2px}
     main{max-width:1280px;margin:26px auto;padding:0 20px}.toolbar{display:flex;align-items:end;gap:14px;flex-wrap:wrap;margin-bottom:18px}.field{display:grid;gap:6px;color:var(--muted);font-size:14px;font-weight:650}.field select{min-width:140px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink)}
@@ -22,6 +22,15 @@
     @media(max-width:700px){header{align-items:flex-start;flex-direction:column;padding:20px}.actions{width:100%}.actions button{flex:1}main{margin:18px auto;padding:0 12px}.cards{grid-template-columns:1fr 1fr;gap:9px}.card{padding:12px;min-height:82px}.card:last-child{grid-column:1/-1}.card .value{font-size:21px}.panel-head{align-items:flex-start;flex-direction:column}.ratebox{align-items:flex-start}.toolbar{gap:10px}.field select{min-width:132px}}
 
     .rate-input{width:145px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink)}
+    .profile-menu{position:relative;color:var(--ink);font-size:14px}
+    .profile-menu>summary{display:flex;align-items:center;gap:9px;min-width:160px;padding:6px 10px;border:1px solid #526b84;border-radius:12px;background:#20364b;color:#fff;cursor:pointer;list-style:none}
+    .profile-menu>summary::-webkit-details-marker{display:none}
+    .profile-avatar{display:grid;place-items:center;width:36px;height:36px;flex:0 0 36px;border-radius:50%;background:#dce9f5;color:#172c46;font-size:15px;font-weight:800}
+    .profile-summary{display:grid;min-width:0;line-height:1.15}.profile-summary strong,.profile-summary small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}.profile-summary small{font-size:11px;color:#c3d1e1}
+    .profile-popover{position:absolute;z-index:20;top:calc(100% + 10px);right:0;width:min(340px,calc(100vw - 28px));padding:16px;background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 42px #0004}
+    .profile-popover h3{margin:0 0 12px;font-size:17px}.profile-popover form{display:grid;gap:9px;margin:0 0 16px}.profile-popover input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink)}
+    .profile-note,.profile-message{font-size:12px;color:var(--muted);margin:8px 0 12px}.profile-message{min-height:18px}.profile-message.error{color:#a12626}.profile-message.ok{color:#25623b}
+    .profile-menu[open]>summary{background:#294a67}
     .expense-form{display:flex;align-items:end;gap:10px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid var(--line)}
     .expense-form input,.expense-form select{min-width:145px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink)}
     .expense-form .description{min-width:190px}.expense-total{font-size:18px;font-weight:750}.expense-delete{padding:5px 9px}
@@ -45,17 +54,34 @@
 <body>
   <header>
     <div><h1>Control de jornada</h1><p>Registro mensual de horas · Nufri · 2027</p></div>
-    <div class="actions"><button id="exportBtn" type="button">Exportar CSV</button><button id="importBtn" type="button">Importar</button><input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden><button id="clearBtn" type="button">Vaciar mes</button></div>
+    <div class="actions"><button id="exportBtn" type="button">Exportar CSV</button><button id="importBtn" type="button">Importar</button><input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden><button id="clearBtn" type="button">Vaciar mes</button>
+      <details class="profile-menu" id="profileMenu" hidden>
+        <summary><span class="profile-avatar" id="profileAvatar" aria-hidden="true">N</span><span class="profile-summary"><strong id="profileName">Mi perfil</strong><small id="profileEmail"></small></span><span aria-hidden="true">⌄</span></summary>
+        <div class="profile-popover">
+          <h3>Mi perfil</h3>
+          <form id="profileForm">
+            <label class="field">Nombre visible<input id="profileDisplayName" type="text" maxlength="60" autocomplete="nickname" required></label>
+            <button class="primary" type="submit">Guardar nombre</button>
+          </form>
+          <form id="changePasswordForm">
+            <label class="field">Nueva contraseña<input id="newPassword" type="password" minlength="8" autocomplete="new-password" required placeholder="Mínimo 8 caracteres"></label>
+            <button type="submit">Cambiar contraseña</button>
+          </form>
+          <p class="profile-note">La contraseña se envía directamente a Supabase Auth y no se guarda en el perfil.</p>
+          <div id="profileMessage" class="profile-message" role="status" aria-live="polite"></div>
+          <button id="signOutBtn" type="button">Cerrar sesión</button>
+        </div>
+      </details>
+    </div>
   </header>
   <main>
-    <section class="auth-panel" aria-labelledby="authTitle">
+    <section id="authPanel" class="auth-panel" aria-labelledby="authTitle">
       <h2 id="authTitle" style="font-size:17px;margin:0 0 8px">Sincronizar tus registros</h2>
       <form id="authForm" class="auth-row">
         <label class="field">Correo electrónico<input id="authEmail" type="email" autocomplete="email" required></label>
         <label class="field">Contraseña<input id="authPassword" type="password" autocomplete="current-password" minlength="8" required></label>
         <button class="primary" type="submit">Iniciar sesión</button><button id="signUpBtn" type="button">Crear cuenta</button>
       </form>
-      <div id="authSession" class="auth-session" hidden><strong id="signedInEmail"></strong><button id="signOutBtn" type="button">Cerrar sesión</button></div>
       <div id="authMessage" class="auth-msg" role="status" aria-live="polite">Sin iniciar sesión, los datos quedan guardados en este navegador. Inicia sesión para sincronizarlos entre dispositivos.</div>
     </section>
     <section class="toolbar" aria-label="Seleccionar periodo">
@@ -72,7 +98,7 @@
       <article class="card"><div class="label">Disponible estimado</div><div id="netEurValue" class="value">— €</div><div id="netCopValue" class="sub">— COP después de gastos</div></article>
     </section>
     <section class="panel">
-      <div class="panel-head"><div><h2 id="monthTitle">Jornada</h2><p>Escribe las horas trabajadas. El total aparece cuando Entrada y Salida están completas.</p></div><div class="ratebox"><span id="rateSource" class="rate">Fuente: Frankfurter</span><button id="refreshRate" type="button">Actualizar cotización</button><span id="rateError" class="status" role="status" aria-live="polite"></span></div></div>
+      <div class="panel-head"><div><h2 id="monthTitle">Jornada</h2><p>Escribe las horas trabajadas. El total aparece cuando Entrada y Salida están completas.</p></div><div class="ratebox"><span id="rateValue" class="rate">1 EUR = — COP</span><span id="rateDate" class="rate-note"></span><span id="rateSource" class="rate-note">Fuente: Frankfurter</span><button id="refreshRate" type="button">Actualizar cotización</button><span id="rateError" class="status" role="status" aria-live="polite"></span></div></div>
       <div class="table-wrap"><table><thead><tr><th scope="col">Fecha</th><th scope="col">Entrada</th><th scope="col">Salida</th><th scope="col">Almuerzo (h)</th><th scope="col">Total (h)</th></tr></thead><tbody id="daysBody"></tbody></table></div>
       <div class="hint">Los domingos están marcados como no laborables y separan las semanas. Las celdas amarillas vacías indican datos pendientes. Si trabajas excepcionalmente un domingo, puedes registrar sus horas.</div>
     </section>
@@ -137,7 +163,7 @@
         $('netEurValue').textContent=gross===null?'— €':fmtEUR.format(gross-expenseTotal);$('netCopValue').textContent=gross===null||rate===null?'— COP después de gastos':fmtCOP.format((gross-expenseTotal)*rate)+' después de gastos';
       }
       function renderExpenses(){expensesBody.replaceChildren();const list=readExpenses();for(const item of list){const tr=document.createElement('tr');for(const value of [item.category||'Otros',item.description||'—',fmtEUR.format(Number(item.amount)||0)]){const td=document.createElement('td');td.textContent=value;tr.append(td)}const action=document.createElement('td'),button=document.createElement('button');button.type='button';button.className='expense-delete';button.textContent='Eliminar';button.setAttribute('aria-label','Eliminar gasto');button.addEventListener('click',()=>{const rest=readExpenses().filter(x=>x.id!==item.id);localStorage.setItem(expensesKey(),JSON.stringify(rest));renderExpenses();summary();status('Gasto eliminado')});action.append(button);tr.append(action);expensesBody.append(tr)}$('expenseSummary').textContent='Total: '+fmtEUR.format(list.reduce((sum,x)=>sum+(Number(x.amount)||0),0))}
-      async function refresh(){const btn=$('refreshRate');btn.disabled=true;$('rateError').textContent='';$('rateValue').textContent='Consultando…';try{const resp=await fetch('https://api.frankfurter.dev/v2/rate/eur/cop',{cache:'no-store'});if(!resp.ok)throw new Error('La fuente no respondió.');const data=await resp.json();if(typeof data.rate!=='number')throw new Error('La fuente no devolvió una cotización válida.');rate=data.rate;$('rateValue').textContent=`1 EUR = ${fmtCOP.format(rate)}`;$('copValue').textContent=fmtCOP.format(rate);$('rateDate').textContent=data.date?`Fecha de referencia: ${data.date}`:'EUR → COP';$('rateSource').textContent='Fuente: Frankfurter';summary()}catch(e){$('rateValue').textContent='No disponible';$('rateError').textContent=e.message+' Puedes volver a intentar.';$('copValue').textContent='— COP'}finally{btn.disabled=false}}
+      async function refresh(){const btn=$('refreshRate');btn.disabled=true;$('rateError').textContent='';$('rateValue').textContent='Consultando…';try{const resp=await fetch('https://api.frankfurter.dev/v2/rate/eur/cop',{cache:'no-store'});if(!resp.ok)throw new Error('La fuente no respondió.');const data=await resp.json();if(typeof data.rate!=='number')throw new Error('La fuente no devolvió una cotización válida.');rate=data.rate;$('rateValue').textContent=`1 EUR = ${fmtCOP.format(rate)}`;$('rateDate').textContent=data.date?`Fecha de referencia: ${data.date}`:'EUR → COP';$('rateSource').textContent='Fuente: Frankfurter';summary()}catch(e){$('rateValue').textContent='No disponible';$('rateError').textContent=e.message+' Puedes volver a intentar.'}finally{btn.disabled=false}}
       function exportCSV(){const y=ys.value,m=Number(ms.value),rows=[['Fecha','Entrada','Salida','Almuerzo (h)','Total (h)']];body.querySelectorAll('tr[data-day]').forEach(tr=>{const d=Number(tr.dataset.day),ins=[...tr.querySelectorAll('input')].map(x=>x.value),total=tr.querySelector('.total').textContent;rows.push([`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,...ins,total.endsWith(' h')?total.slice(0,-2).trim():total==='—'?'':total])});
         rows.push(['','','','',''],['Gastos del mes','','','','']);readExpenses().forEach(x=>rows.push([x.category||'Otros',x.description||'',fmtEUR.format(Number(x.amount)||0),'','']));
         rows.push(['','','','',''],['Tarifa por hora (EUR)',readHourlyRate()??'','','',''],['Horas del mes',$('hoursValue').textContent,'','',''],['Valor estimado (EUR)',$('eurWageValue').textContent,'','',''],['Valor estimado (COP)',$('copWageValue').textContent,'','','']);
@@ -261,26 +287,38 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     (() => {
-      const URL = 'https://loiyohgcgcgdjrkrbpgm.supabase.co';
-      const KEY = 'sb_publishable_MjcIx-_pVKosFuNzni810Q_0QaMUAUi';
+      const URL = 'https://obifekwncoeuhvcnbckk.supabase.co';
+      const KEY = 'sb_publishable_SLyXnizEGhKS8u92Y9KDIg_sC2hNbz3';
       const db = window.supabase.createClient(URL, KEY);
       const prefixes = ['nufri-jornada-v1-', 'nufri-expenses-v1-', 'nufri-settings-v1-'];
       const isAppKey = key => prefixes.some(prefix => String(key).startsWith(prefix));
+      const authPanel = document.getElementById('authPanel');
       const box = document.getElementById('authMessage');
       const form = document.getElementById('authForm');
-      const panel = document.getElementById('authSession');
+      const profileMenu = document.getElementById('profileMenu');
+      const profileMessage = document.getElementById('profileMessage');
       let currentUser = null;
       const setMessage = (text, kind) => { box.textContent = text; box.className = 'auth-msg' + (kind ? ' ' + kind : ''); };
+      const setProfileMessage = (text, kind) => { profileMessage.textContent = text; profileMessage.className = 'profile-message' + (kind ? ' ' + kind : ''); };
       const storage = window.localStorage;
       const originalSet = storage.setItem.bind(storage);
       const originalRemove = storage.removeItem.bind(storage);
       const pending = new Map();
+      function showProfile(user) {
+        const fallback = (user?.email || 'Mi perfil').split('@')[0];
+        const displayName = String(user?.user_metadata?.display_name || user?.user_metadata?.full_name || fallback);
+        document.getElementById('profileName').textContent = displayName;
+        document.getElementById('profileEmail').textContent = user?.email || '';
+        document.getElementById('profileDisplayName').value = displayName;
+        document.getElementById('profileAvatar').textContent = displayName.trim().split(/\s+/).slice(0,2).map(word => word.charAt(0).toUpperCase()).join('') || 'N';
+        profileMenu.hidden = false;
+        authPanel.hidden = true;
+      }
       async function pushKey(key, payload, userId) {
-        const { error } = await db.from('attendance_months').upsert({
-          user_id: userId, storage_key: key, payload: JSON.parse(payload)
-        }, { onConflict: 'user_id,storage_key' });
-        if (error) setMessage('No se pudo sincronizar: ' + error.message, 'error');
-        else document.getElementById('saveStatus').textContent = 'Sincronizado con Supabase';
+        const { error } = await db.from('attendance_months').upsert({ user_id: userId, storage_key: key, payload: JSON.parse(payload) }, { onConflict: 'user_id,storage_key' });
+        if (error) { console.error('No se pudo sincronizar el registro', key, error); setMessage('No se pudo sincronizar: ' + error.message, 'error'); return false; }
+        document.getElementById('saveStatus').textContent = 'Sincronizado con Supabase';
+        return true;
       }
       storage.setItem = function(key, value) {
         originalSet(key, value);
@@ -298,57 +336,55 @@
             .then(({error}) => { if(error) setMessage('No se pudo borrar en Supabase: ' + error.message, 'error'); });
         }
       };
-      async function sync(userId) {
-        setMessage('Sincronizando datos con Supabase…');
-        const { data, error } = await db.from('attendance_months').select('storage_key,payload').eq('user_id', userId);
-        if (error) { setMessage('No se pudo conectar con la tabla. Revisa la configuración de Supabase: ' + error.message, 'error'); return false; }
+      async function sync(user) {
+        currentUser = user.id; showProfile(user); setMessage('Sincronizando datos con Supabase…');
+        const { data, error } = await db.from('attendance_months').select('storage_key,payload').eq('user_id', user.id);
+        if (error) { setMessage('Sesión iniciada, pero no se pudo leer attendance_months: ' + error.message, 'error'); return false; }
         const remote = new Map((data || []).map(row => [row.storage_key, row.payload]));
-        let changed = false;
-        for (const [key, payload] of remote) {
-          if (!storage.getItem(key) || storage.getItem(key) !== JSON.stringify(payload)) {
-            originalSet(key, JSON.stringify(payload)); changed = true;
-          }
-        }
-        for (let i = 0; i < storage.length; i++) {
-          const key = storage.key(i);
-          if (!isAppKey(key)) continue;
-          const local = storage.getItem(key);
-          if (local && !remote.has(key)) await pushKey(key, local, userId);
-        }
-        currentUser = userId;
-        document.getElementById('signedInEmail').textContent = document.getElementById('authEmail').value || 'Sesión iniciada';
-        panel.hidden = false; form.hidden = true;
-        setMessage('Sesión iniciada. Los cambios se sincronizan con tu cuenta y quedan guardados por separado para cada usuario.', 'ok');
-        if (changed && !sessionStorage.getItem('nufri-sync-reloaded')) {
-          sessionStorage.setItem('nufri-sync-reloaded', '1'); location.reload();
-        } else sessionStorage.removeItem('nufri-sync-reloaded');
-        return true;
+        let changed = false, failed = 0;
+        for (const [key, payload] of remote) { if (!storage.getItem(key) || storage.getItem(key) !== JSON.stringify(payload)) { originalSet(key, JSON.stringify(payload)); changed = true; } }
+        const localKeys = Array.from({length: storage.length}, (_, i) => storage.key(i)).filter(isAppKey);
+        for (const key of localKeys) { const local = storage.getItem(key); if (local && !remote.has(key) && !(await pushKey(key, local, user.id))) failed++; }
+        if (failed) setMessage('Sesión iniciada. ' + failed + ' registros no se sincronizaron; revisa la configuración de la tabla.', 'error');
+        else setMessage('Sesión iniciada. Los cambios se sincronizan y quedan separados por usuario.', 'ok');
+        if (changed && !sessionStorage.getItem('nufri-sync-reloaded')) { sessionStorage.setItem('nufri-sync-reloaded', '1'); location.reload(); }
+        else sessionStorage.removeItem('nufri-sync-reloaded');
+        return failed === 0;
       }
       form.addEventListener('submit', async event => {
         event.preventDefault(); setMessage('Iniciando sesión…');
-        const { data, error } = await db.auth.signInWithPassword({
-          email: document.getElementById('authEmail').value.trim(),
-          password: document.getElementById('authPassword').value
-        });
-        if (error) setMessage(error.message, 'error'); else await sync(data.user.id);
+        const { data, error } = await db.auth.signInWithPassword({ email: document.getElementById('authEmail').value.trim(), password: document.getElementById('authPassword').value });
+        if (error) setMessage(error.message, 'error'); else await sync(data.user);
       });
       document.getElementById('signUpBtn').addEventListener('click', async () => {
-        const email = document.getElementById('authEmail').value.trim();
-        const password = document.getElementById('authPassword').value;
+        const email = document.getElementById('authEmail').value.trim(), password = document.getElementById('authPassword').value;
         if (!email || password.length < 8) { setMessage('Escribe tu correo y una contraseña de al menos 8 caracteres.', 'error'); return; }
         setMessage('Creando cuenta…');
         const { data, error } = await db.auth.signUp({ email, password });
-        if (error) setMessage(error.message, 'error');
-        else if (data.session) await sync(data.user.id);
-        else setMessage('Cuenta creada. Confirma el correo que te enviamos y luego inicia sesión.', 'ok');
+        if (error) setMessage(error.message, 'error'); else if (data.session) await sync(data.user);
+        else setMessage('Cuenta creada. Confirma el correo y luego inicia sesión.', 'ok');
+      });
+      document.getElementById('profileForm').addEventListener('submit', async event => {
+        event.preventDefault(); const displayName = document.getElementById('profileDisplayName').value.trim();
+        if (!displayName) { setProfileMessage('Escribe un nombre.', 'error'); return; }
+        setProfileMessage('Guardando nombre…');
+        const { data, error } = await db.auth.updateUser({ data: { display_name: displayName } });
+        if (error) setProfileMessage(error.message, 'error'); else { showProfile(data.user); setProfileMessage('Nombre actualizado.', 'ok'); }
+      });
+      document.getElementById('changePasswordForm').addEventListener('submit', async event => {
+        event.preventDefault(); const password = document.getElementById('newPassword').value;
+        if (password.length < 8) { setProfileMessage('La contraseña debe tener al menos 8 caracteres.', 'error'); return; }
+        setProfileMessage('Actualizando contraseña…');
+        const { error } = await db.auth.updateUser({ password }); document.getElementById('newPassword').value = '';
+        if (error) setProfileMessage(error.message, 'error'); else setProfileMessage('Contraseña actualizada. No se guarda en la app.', 'ok');
       });
       document.getElementById('signOutBtn').addEventListener('click', async () => {
-        await db.auth.signOut(); currentUser = null; panel.hidden = true; form.hidden = false;
-        setMessage('Sesión cerrada. Los registros quedan guardados localmente en este navegador.');
+        const { error } = await db.auth.signOut();
+        if (error) { setProfileMessage(error.message, 'error'); return; }
+        currentUser = null; profileMenu.hidden = true; profileMenu.open = false; authPanel.hidden = false; form.hidden = false;
+        setMessage('Sesión cerrada. Tus registros permanecen guardados en este navegador.');
       });
-      db.auth.getSession().then(({data}) => {
-        if (data.session) sync(data.session.user.id);
-      });
+      db.auth.getSession().then(({data}) => { if (data.session) sync(data.session.user); });
     })();
   </script>
 </body>
