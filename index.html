@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#172c46">
+  <title>Jornada Nufri · 2027</title>
+  <style>
+    :root{color-scheme:light;--ink:#172c46;--muted:#617086;--line:#d8e0e9;--blue:#dce9f5;--blue-dark:#9db7d1;--paper:#f3f6fa;--white:#fff;--accent:#1d5d91;--warn:#fff0d2;--shadow:0 12px 32px #172c4612}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+    header{background:var(--ink);color:white;padding:24px max(20px,calc((100vw - 1280px)/2));display:flex;align-items:center;justify-content:space-between;gap:20px}header h1{font-size:clamp(22px,3vw,30px);line-height:1.15;margin:0 0 5px}header p{margin:0;color:#c3d1e1;font-size:14px}.actions{display:flex;gap:9px;flex-wrap:wrap}
+    button,select,input{font:inherit}button{border:1px solid #b8c6d5;border-radius:10px;background:white;color:var(--ink);padding:10px 14px;font-weight:650;cursor:pointer}button:hover{background:#edf4fb}button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #70a9d7;outline-offset:2px}
+    main{max-width:1280px;margin:26px auto;padding:0 20px}.toolbar{display:flex;align-items:end;gap:14px;flex-wrap:wrap;margin-bottom:18px}.field{display:grid;gap:6px;color:var(--muted);font-size:14px;font-weight:650}.field select{min-width:140px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink)}
+    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}.card{background:white;border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);min-height:92px}.card .label{color:var(--muted);font-size:13px;font-weight:650}.card .value{font-size:24px;font-weight:750;letter-spacing:-.02em;margin-top:4px}.card .sub{font-size:13px;color:var(--muted);margin-top:2px}
+    .panel{background:white;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid var(--line)}.panel-head h2{font-size:18px;margin:0}.panel-head p{margin:3px 0 0;color:var(--muted);font-size:14px}.ratebox{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.rate{font-weight:750;white-space:nowrap}.rate-note{color:var(--muted);font-size:12px;max-width:200px}.table-wrap{overflow:auto}table{width:100%;border-collapse:separate;border-spacing:0;min-width:680px}th{background:#eaf0f6;color:#334b66;text-align:left;font-size:14px;padding:11px 14px;position:sticky;top:0;z-index:1;border-bottom:1px solid #cad5e1}td{padding:7px 12px;border-bottom:1px solid #e7edf3}th:first-child,td:first-child{padding-left:18px}td.date{font-weight:600;white-space:nowrap}td.date small{display:block;color:var(--muted);font-size:12px;font-weight:500}input.time,input.lunch{width:100%;max-width:150px;border:1px solid #c7d3df;border-radius:8px;padding:9px 10px;color:var(--ink);background:#fffdf3}input.lunch{max-width:126px;text-align:right}input::placeholder{color:#8795a4}.total{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}.empty{color:#8a98a7;font-weight:500}.sunday td{background:#9db7d1;border-color:#7896b3}.sunday td:first-child{border-left:4px solid #3b5d7e}.sunday td:last-child{border-bottom:3px solid #385a78}.sunday .date,.sunday .total{color:#142b43}.sunday input{background:#eaf0f6}.sunday-tag{display:inline-block;color:#294b6c;font-size:11px;font-weight:750;letter-spacing:.02em}.hint{padding:13px 18px;color:var(--muted);font-size:13px;background:#f9fbfd;border-top:1px solid var(--line)}.status{min-height:20px;color:var(--muted);font-size:13px}.footer{margin:14px 2px 32px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}.toast{position:fixed;right:20px;bottom:20px;background:var(--ink);color:#fff;padding:12px 16px;border-radius:10px;box-shadow:var(--shadow);display:none;max-width:min(420px,calc(100vw - 40px))}
+    .legal{margin-top:16px;background:#fff;border:1px solid var(--line);border-left:5px solid #557a9c;border-radius:12px;padding:16px 18px}.legal h2{margin:0 0 8px;font-size:17px}.legal p{margin:7px 0;color:#465b70;font-size:14px}.legal ul{margin:6px 0;padding-left:21px;color:#465b70;font-size:14px}.legal li{margin:5px 0}.legal a{color:#1d5d91;font-weight:650}.legal .caution{color:#76521d;background:#fff6e5;border-radius:8px;padding:9px 11px}
+    @media(max-width:700px){header{align-items:flex-start;flex-direction:column;padding:20px}.actions{width:100%}.actions button{flex:1}main{margin:18px auto;padding:0 12px}.cards{grid-template-columns:1fr 1fr;gap:9px}.card{padding:12px;min-height:82px}.card:last-child{grid-column:1/-1}.card .value{font-size:21px}.panel-head{align-items:flex-start;flex-direction:column}.ratebox{align-items:flex-start}.toolbar{gap:10px}.field select{min-width:132px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div><h1>Control de jornada</h1><p>Registro mensual de horas · Nufri · 2027</p></div>
+    <div class="actions"><button id="exportBtn" type="button">Exportar CSV</button><button id="clearBtn" type="button">Vaciar mes</button></div>
+  </header>
+  <main>
+    <section class="toolbar" aria-label="Seleccionar periodo">
+      <label class="field">Año<select id="yearSelect" aria-label="Año"></select></label>
+      <label class="field">Mes<select id="monthSelect" aria-label="Mes"></select></label>
+      <span id="saveStatus" class="status" role="status" aria-live="polite"></span>
+    </section>
+    <section class="cards" aria-label="Resumen del mes">
+      <article class="card"><div class="label">Horas registradas</div><div id="hoursValue" class="value">0,00 h</div><div id="daysValue" class="sub">0 días con jornada completa</div></article>
+      <article class="card"><div class="label">Cotización de referencia</div><div id="rateValue" class="value">Cargando…</div><div id="rateDate" class="sub">EUR → COP</div></article>
+      <article class="card"><div class="label">Equivalencia de 1 EUR</div><div id="copValue" class="value">— COP</div><div class="sub">Referencia informativa, no precio bancario en tiempo real</div></article>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div><h2 id="monthTitle">Jornada</h2><p>Escribe las horas trabajadas. El total aparece cuando Entrada y Salida están completas.</p></div><div class="ratebox"><span id="rateSource" class="rate">Fuente: Frankfurter</span><button id="refreshRate" type="button">Actualizar cotización</button><span id="rateError" class="status" role="status" aria-live="polite"></span></div></div>
+      <div class="table-wrap"><table><thead><tr><th scope="col">Fecha</th><th scope="col">Entrada</th><th scope="col">Salida</th><th scope="col">Almuerzo (h)</th><th scope="col">Total (h)</th></tr></thead><tbody id="daysBody"></tbody></table></div>
+      <div class="hint">Los domingos están marcados como no laborables y separan las semanas. Las celdas amarillas vacías indican datos pendientes. Si trabajas excepcionalmente un domingo, puedes registrar sus horas.</div>
+    </section>
+    <section class="legal" aria-labelledby="legalTitle">
+      <h2 id="legalTitle">Referencias laborales · España</h2>
+      <p>Marco general informativo del Estatuto de los Trabajadores:</p>
+      <ul>
+        <li>La jornada ordinaria se determina por convenio o contrato y no supera, como regla general, 40 horas semanales de promedio anual.</li>
+        <li>Entre jornadas deben mediar al menos 12 horas; el límite ordinario es 9 horas efectivas al día salvo otra distribución acordada conforme a la ley.</li>
+        <li>En jornada continuada superior a 6 horas se establece un descanso mínimo de 15 minutos; su cómputo como trabajo efectivo depende del convenio o contrato.</li>
+        <li>La regla general de descanso semanal es de día y medio ininterrumpido, con las posibilidades de acumulación y regímenes previstos legalmente.</li>
+      </ul>
+      <p class="caution">Esta app es un registro personal orientativo. No comprueba tu convenio, contrato, excepciones sectoriales ni el promedio anual, y el almacenamiento local/CSV no sustituye por sí solo el sistema de registro que debe garantizar la empresa.</p>
+      <p>Fuente oficial: <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430&lang=es" target="_blank" rel="noopener noreferrer">Estatuto de los Trabajadores (BOE), artículos 34 y 37</a>.</p>
+    </section>
+    <div class="footer"><span>Los datos se guardan en este navegador. Usa Exportar CSV para conservar una copia.</span><span>La cotización se obtiene de una fuente pública de tipos de referencia, que puede llevar retraso.</span></div>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script>
+    (()=>{
+      const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+      const weekday=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+      const fmtHours=new Intl.NumberFormat('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const fmtCOP=new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0});
+      const $=id=>document.getElementById(id); const ys=$('yearSelect'), ms=$('monthSelect'), body=$('daysBody');
+      let rate=null, rateDate='', saveTimer;
+      for(let y=2026;y<=2035;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===2027)o.selected=true;ys.append(o)}
+      months.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m;ms.append(o)});
+      const key=()=>`nufri-jornada-v1-${ys.value}-${ms.value}`;
+      const read=()=>{try{return JSON.parse(localStorage.getItem(key())||'{}')}catch{return {}}};
+      function save(){const data={};body.querySelectorAll('tr[data-day]').forEach(tr=>{const v=[...tr.querySelectorAll('input')].map(x=>x.value);if(v.some(Boolean))data[tr.dataset.day]=v});try{localStorage.setItem(key(),JSON.stringify(data));$('saveStatus').textContent='Guardado en este navegador';clearTimeout(saveTimer);saveTimer=setTimeout(()=>$('saveStatus').textContent='',2200)}catch{$('saveStatus').textContent='No se pudo guardar: almacenamiento lleno'}}
+      function render(){const y=Number(ys.value),m=Number(ms.value),saved=read(),count=new Date(y,m+1,0).getDate();$('monthTitle').textContent=`${months[m]} ${y}`;body.replaceChildren();let d0=new Date(y,m,1).getDay();
+        for(let d=1;d<=count;d++){const dt=new Date(y,m,d),dow=dt.getDay(),row=saved[String(d)]||['','',''];const tr=document.createElement('tr');tr.dataset.day=d;if(dow===0)tr.className='sunday';const date=document.createElement('td');date.className='date';date.innerHTML=`${weekday[dow].charAt(0).toUpperCase()+weekday[dow].slice(1)} ${String(d).padStart(2,'0')}/${String(m+1).padStart(2,'0')}/${y}${dow===0?'<small><span class="sunday-tag">DOMINGO · NO LABORABLE</span></small>':''}`;tr.append(date);
+          ['time','time','number'].forEach((type,i)=>{const td=document.createElement('td'),inp=document.createElement('input');inp.className=i===2?'lunch':'time';inp.type=type;inp.setAttribute('aria-label',`${weekday[dow]} ${d} ${i===0?'entrada':i===1?'salida':'horas de almuerzo'}`);inp.value=row[i]||'';if(type==='time'){inp.step='60'}else{inp.min='0';inp.max='24';inp.step='0.25';inp.placeholder='Opcional'}inp.addEventListener('input',()=>{calc(tr);save()});td.append(inp);tr.append(td)});
+          const total=document.createElement('td');total.className='total empty';total.textContent='—';tr.append(total);calc(tr);body.append(tr)}summary();}
+      function calc(tr){const [a,b,l]=[...tr.querySelectorAll('input')].map(x=>x.value);const cell=tr.querySelector('.total');if(!a||!b){cell.textContent='—';cell.classList.add('empty');return}const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let hours=(bh*60+bm-ah*60-am)/60;if(hours<0)hours+=24;const lunch=l===''?0:Number(l);if(!Number.isFinite(lunch)||lunch<0||lunch>hours){cell.textContent='Revisar pausa';cell.classList.add('empty');return}cell.textContent=`${fmtHours.format(hours-lunch)} h`;cell.classList.remove('empty')}
+      function summary(){let total=0,days=0;body.querySelectorAll('tr').forEach(tr=>{const text=tr.querySelector('.total').textContent;if(text.endsWith(' h')){total+=Number(text.replace(' h','').replace(',','.'));days++}});$('hoursValue').textContent=`${fmtHours.format(total)} h`;$('daysValue').textContent=`${days} ${days===1?'día':'días'} con jornada completa`}
+      async function refresh(){const btn=$('refreshRate');btn.disabled=true;$('rateError').textContent='';$('rateValue').textContent='Consultando…';try{const resp=await fetch('https://api.frankfurter.dev/v2/rate/eur/cop',{cache:'no-store'});if(!resp.ok)throw new Error('La fuente no respondió.');const data=await resp.json();if(typeof data.rate!=='number')throw new Error('La fuente no devolvió una cotización válida.');rate=data.rate;rateDate=data.date||'';$('rateValue').textContent=`1 EUR = ${fmtCOP.format(rate)}`;$('copValue').textContent=fmtCOP.format(rate);$('rateDate').textContent=rateDate?`Fecha de referencia: ${rateDate}`:'EUR → COP';$('rateSource').textContent='Fuente: Frankfurter';}catch(e){$('rateValue').textContent='No disponible';$('rateError').textContent=e.message+' Puedes volver a intentar.';$('copValue').textContent='— COP'}finally{btn.disabled=false}}
+      function exportCSV(){const y=ys.value,m=Number(ms.value),rows=[['Fecha','Entrada','Salida','Almuerzo (h)','Total (h)']];body.querySelectorAll('tr[data-day]').forEach(tr=>{const d=Number(tr.dataset.day),ins=[...tr.querySelectorAll('input')].map(x=>x.value),total=tr.querySelector('.total').textContent;rows.push([`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,...ins,total.endsWith(' h')?total.slice(0,-2).trim():total==='—'?'':total])});const csv='\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(';')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`jornada-nufri-${y}-${String(m+1).padStart(2,'0')}.csv`;a.click();URL.revokeObjectURL(url)}
+      $('exportBtn').addEventListener('click',exportCSV);$('refreshRate').addEventListener('click',refresh);ys.addEventListener('change',render);ms.addEventListener('change',render);
+      $('clearBtn').addEventListener('click',()=>{if(!confirm(`¿Vaciar Entrada, Salida y Almuerzo de ${months[Number(ms.value)]} ${ys.value}? Esta acción no se puede deshacer.`))return;localStorage.removeItem(key());render();$('toast').textContent='Mes vaciado';$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)});
+      ms.value='0';render();refresh();
+    })();
+  </script>
+</body>
+</html>
+
