@@ -412,7 +412,13 @@
       const setProfileMessage = (text, kind) => { profileMessage.textContent = text; profileMessage.className = 'profile-message' + (kind ? ' ' + kind : ''); };
       const storage = window.localStorage;
       const profileAvatarKey = 'nufri-settings-v1-profile-avatar';
-      function renderAvatar(value = storage.getItem(profileAvatarKey)) {
+      function getSavedAvatar() {
+        const saved = storage.getItem(profileAvatarKey);
+        if (!saved) return null;
+        try { const value = JSON.parse(saved); return typeof value === 'string' && value.startsWith('data:image/') ? value : null; }
+        catch { return saved.startsWith('data:image/') ? saved : null; }
+      }
+      function renderAvatar(value = getSavedAvatar()) {
         const avatar = document.getElementById('profileAvatar'), preview = document.getElementById('profileAvatarPreview');
         const fallback = document.getElementById('profileFallbackIcon');
         if (value) { avatar.src = value; avatar.hidden = false; fallback.hidden = true; preview.src = value; preview.hidden = false; }
@@ -507,7 +513,7 @@
       }
       document.getElementById('profileAvatarInput').addEventListener('change', async event => {
         const file = event.target.files?.[0]; if (!file) return;
-        try { const avatar = await resizeAvatar(file); storage.setItem(profileAvatarKey, avatar); renderAvatar(avatar); setProfileMessage('Foto de perfil guardada y sincronizando.', 'ok'); }
+        try { const avatar = await resizeAvatar(file); storage.setItem(profileAvatarKey, JSON.stringify(avatar)); renderAvatar(avatar); setProfileMessage('Foto de perfil guardada y sincronizando.', 'ok'); }
         catch (error) { setProfileMessage(error.message || 'No se pudo guardar la imagen.', 'error'); }
         event.target.value = '';
       });
