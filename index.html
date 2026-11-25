@@ -45,7 +45,7 @@
 <body>
   <header>
     <div><h1>Control de jornada</h1><p>Registro mensual de horas · Nufri · 2027</p></div>
-    <div class="actions"><button id="exportBtn" type="button">Exportar CSV</button><button id="clearBtn" type="button">Vaciar mes</button></div>
+    <div class="actions"><button id="exportBtn" type="button">Exportar CSV</button><button id="importBtn" type="button">Importar 2026</button><input id="importFile" type="file" accept=".json,application/json" hidden><button id="clearBtn" type="button">Vaciar mes</button></div>
   </header>
   <main>
     <section class="auth-panel" aria-labelledby="authTitle">
@@ -111,14 +111,16 @@
       const fmtEUR=new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2});
       const $=id=>document.getElementById(id), ys=$('yearSelect'), ms=$('monthSelect'), body=$('daysBody'), expensesBody=$('expensesBody');
       let rate=null, saveTimer;
-      const settingsKey='nufri-settings-v1-hourly-rate';
+      const legacySettingsKey='nufri-settings-v1-hourly-rate';
+      const hourlyRateKey=()=>`nufri-settings-v1-hourly-rate-${ys.value}-${ms.value}`;
       for(let y=2026;y<=2035;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===2027)o.selected=true;ys.append(o)}
       months.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m;ms.append(o)});
       const key=()=>`nufri-jornada-v1-${ys.value}-${ms.value}`;
       const expensesKey=()=>`nufri-expenses-v1-${ys.value}-${ms.value}`;
       const read=()=>{try{return JSON.parse(localStorage.getItem(key())||'{}')}catch{return {}}};
       const readExpenses=()=>{try{const v=JSON.parse(localStorage.getItem(expensesKey())||'[]');return Array.isArray(v)?v:[]}catch{return []}};
-      const readHourlyRate=()=>{try{return JSON.parse(localStorage.getItem(settingsKey)||'null')}catch{return null}};
+      const readSetting=key=>{try{return JSON.parse(localStorage.getItem(key)||'null')}catch{return null}};
+      const readHourlyRate=()=>readSetting(hourlyRateKey())??readSetting(legacySettingsKey)??'';
       function status(text){$('saveStatus').textContent=text;clearTimeout(saveTimer);if(text)setTimeout(()=>$('saveStatus').textContent='',2400)}
       function save(){const data={};body.querySelectorAll('tr[data-day]').forEach(tr=>{const v=[...tr.querySelectorAll('input')].map(x=>x.value);if(v.some(Boolean))data[tr.dataset.day]=v});try{localStorage.setItem(key(),JSON.stringify(data));status('Guardado en este navegador')}catch{status('No se pudo guardar: almacenamiento lleno')}}
       function render(){const y=Number(ys.value),m=Number(ms.value),saved=read(),count=new Date(y,m+1,0).getDate();$('monthTitle').textContent=`${months[m]} ${y}`;body.replaceChildren();
@@ -141,7 +143,36 @@
         rows.push(['','','','',''],['Tarifa por hora (EUR)',readHourlyRate()??'','','',''],['Horas del mes',$('hoursValue').textContent,'','',''],['Valor estimado (EUR)',$('eurWageValue').textContent,'','',''],['Valor estimado (COP)',$('copWageValue').textContent,'','','']);
         const csv='\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(';')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`nufri-${y}-${String(m+1).padStart(2,'0')}.csv`;a.click();URL.revokeObjectURL(url)}
       $('expenseForm').addEventListener('submit',event=>{event.preventDefault();const amount=Number($('expenseAmount').value);if(!Number.isFinite(amount)||amount<=0)return;const list=readExpenses();list.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),category:$('expenseCategory').value,description:$('expenseDescription').value.trim(),amount});localStorage.setItem(expensesKey(),JSON.stringify(list));$('expenseDescription').value='';$('expenseAmount').value='';renderExpenses();summary();status('Gasto guardado')});
-      $('hourlyRate').addEventListener('input',()=>{const value=$('hourlyRate').value;if(value===''||Number(value)>=0){localStorage.setItem(settingsKey,JSON.stringify(value===''?'':Number(value)));summary();status('Tarifa guardada')}})
+      $('hourlyRate').addEventListener('input',()=>{const value=$('hourlyRate').value;if(value===''||Number(value)>=0){localStorage.setItem(hourlyRateKey(),JSON.stringify(value===''?'':Number(value)));summary();status('Tarifa guardada')}})
+      $('importBtn').addEventListener('click',()=>$('importFile').click());
+      $('importFile').addEventListener('change',async()=>{
+        const file=$('importFile').files?.[0];if(!file)return;
+        try{
+          const payload=JSON.parse(await file.text());
+          if(payload.year!==2026||!payload.months||typeof payload.months!=='object')throw new Error('El archivo no contiene una importación válida de 2026.');
+          let monthCount=0,dayCount=0,expenseCount=0;
+          for(const [monthText,monthData] of Object.entries(payload.months)){
+            const month=Number(monthText);if(!Number.isInteger(month)||month<0||month>11)throw new Error('Hay un mes fuera del calendario.');
+            const maxDay=new Date(2026,month+1,0).getDate(),monthKey=`nufri-jornada-v1-2026-${month}`;
+            let saved={};try{saved=JSON.parse(localStorage.getItem(monthKey)||'{}')}catch{}
+            for(const [dayText,row] of Object.entries(monthData.days||{})){
+              const day=Number(dayText);
+              if(!Number.isInteger(day)||day<1||day>maxDay||!Array.isArray(row)||row.length!==3)throw new Error('Hay un registro diario con formato o fecha no válida.');
+              if(row.some(Boolean)){saved[String(day)]=row;dayCount++}
+            }
+            localStorage.setItem(monthKey,JSON.stringify(saved));
+            if(Number.isFinite(Number(monthData.hourlyRate)))localStorage.setItem(`nufri-settings-v1-hourly-rate-2026-${month}`,JSON.stringify(Number(monthData.hourlyRate)));
+            const expKey=`nufri-expenses-v1-2026-${month}`;let expenses=[];try{expenses=JSON.parse(localStorage.getItem(expKey)||'[]')}catch{}
+            if(!Array.isArray(expenses))expenses=[];
+            const ids=new Set(expenses.map(item=>item.id));
+            for(const item of monthData.expenses||[]){if(!item.id||ids.has(item.id))continue;const amount=Number(item.amount);if(!Number.isFinite(amount)||amount<=0)throw new Error('Hay un gasto con importe no válido.');expenses.push({...item,amount});ids.add(item.id);expenseCount++}
+            localStorage.setItem(expKey,JSON.stringify(expenses));monthCount++;
+          }
+          $('importFile').value='';if(Number(ys.value)===2026)render();
+          $('toast').textContent=`Importación lista: ${monthCount} meses, ${dayCount} jornadas y ${expenseCount} gastos.`;
+          $('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000);
+        }catch(error){$('toast').textContent='No se pudo importar: '+error.message;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000)}
+      });
       $('exportBtn').addEventListener('click',exportCSV);$('refreshRate').addEventListener('click',refresh);ys.addEventListener('change',render);ms.addEventListener('change',render);
       $('clearBtn').addEventListener('click',()=>{if(!confirm(`¿Vaciar jornada y gastos de ${months[Number(ms.value)]} ${ys.value}? Esta acción no se puede deshacer.`))return;localStorage.removeItem(key());localStorage.removeItem(expensesKey());render();$('toast').textContent='Mes vaciado';$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)});
       const scheme=window.matchMedia('(prefers-color-scheme: dark)');const applyTheme=()=>document.querySelector('meta[name="theme-color"]').content=scheme.matches?'#0c151e':'#172c46';applyTheme();scheme.addEventListener?.('change',applyTheme);
