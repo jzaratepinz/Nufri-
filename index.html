@@ -603,15 +603,7 @@
       const adminSection=document.getElementById('adminSection');const profileRole=document.getElementById('profileRole');
       const adminUsers=document.getElementById('adminUsers');
       const adminMessage=document.getElementById('adminMessage');
-      async function checkAdmin(load=true) {
-        adminSection.hidden=true;profileRole.hidden=true;
-        if(!currentUser)return false;
-        const {data,error}=await db.functions.invoke('admin-users',{method:'GET'});
-        if(error){if(error.context?.status!==403)setProfileMessage('No se pudo comprobar el rol de administrador. Recarga e inicia sesión de nuevo.','error');return false}
-        if(!Array.isArray(data)){setProfileMessage('La respuesta de administración no tiene el formato esperado.','error');return false}
-        adminSection.hidden=false;profileRole.hidden=false;
-        if(load)renderAdminUsers(data);
-        return true;
+      async function checkAdmin(load=true) { if(!currentUser){adminSection.hidden=true;profileRole.hidden=true;return false} const {data,error}=await db.functions.invoke('admin-users',{method:'GET'}); if(error){adminSection.hidden=true;profileRole.hidden=true;if(error.context?.status!==403)setProfileMessage('No se pudo comprobar el rol de administrador. Recarga e inicia sesión de nuevo.','error');return false} if(!Array.isArray(data)){adminSection.hidden=true;profileRole.hidden=true;setProfileMessage('La respuesta de administración no tiene el formato esperado.','error');return false} adminSection.hidden=false;profileRole.hidden=false; if(load)renderAdminUsers(data); return true;
       }
       function renderAdminUsers(users) {
         adminUsers.replaceChildren();
