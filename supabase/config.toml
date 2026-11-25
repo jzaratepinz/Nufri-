@@ -1,4 +1,4 @@
-project_id = "obifekwncoeuhvcnbckk"
+project_id = "loiyohgcgcgdjrkrbpgm"
 
 [functions.admin-users]
 # The function verifies the Supabase user token with auth.getUser() and checks app_admins itself.
