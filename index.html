@@ -45,7 +45,7 @@
 <body>
   <header>
     <div><h1>Control de jornada</h1><p>Registro mensual de horas · Nufri · 2027</p></div>
-    <div class="actions"><button id="exportBtn" type="button">Exportar CSV</button><button id="importBtn" type="button">Importar 2026</button><input id="importFile" type="file" accept=".json,application/json" hidden><button id="clearBtn" type="button">Vaciar mes</button></div>
+    <div class="actions"><button id="exportBtn" type="button">Exportar CSV</button><button id="importBtn" type="button">Importar</button><input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden><button id="clearBtn" type="button">Vaciar mes</button></div>
   </header>
   <main>
     <section class="auth-panel" aria-labelledby="authTitle">
@@ -102,6 +102,7 @@
     <div class="footer"><span>Los datos se guardan en este navegador. Usa Exportar CSV para conservar una copia.</span><span>La cotización se obtiene de una fuente pública de tipos de referencia, que puede llevar retraso.</span></div>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script>
     (()=> {
       const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -144,28 +145,95 @@
         const csv='\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(';')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`nufri-${y}-${String(m+1).padStart(2,'0')}.csv`;a.click();URL.revokeObjectURL(url)}
       $('expenseForm').addEventListener('submit',event=>{event.preventDefault();const amount=Number($('expenseAmount').value);if(!Number.isFinite(amount)||amount<=0)return;const list=readExpenses();list.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),category:$('expenseCategory').value,description:$('expenseDescription').value.trim(),amount});localStorage.setItem(expensesKey(),JSON.stringify(list));$('expenseDescription').value='';$('expenseAmount').value='';renderExpenses();summary();status('Gasto guardado')});
       $('hourlyRate').addEventListener('input',()=>{const value=$('hourlyRate').value;if(value===''||Number(value)>=0){localStorage.setItem(hourlyRateKey(),JSON.stringify(value===''?'':Number(value)));summary();status('Tarifa guardada')}})
+      function parseExcelImport(workbook,fileName){
+        if(!window.XLSX)throw new Error('No se pudo cargar el lector de Excel. Comprueba la conexión e inténtalo otra vez.');
+        const norm=value=>String(value??'').trim().toLocaleLowerCase('es');
+        const number=value=>{
+          if(typeof value==='number'&&Number.isFinite(value))return value;
+          if(value==null||value==='')return null;
+          let text=String(value).trim().replace(/[€$\\s]/g,'');
+          if(text.includes(',')&&text.includes('.'))text=text.replace(/\\./g,'').replace(',','.');
+          else text=text.replace(',','.');
+          const result=Number(text);return Number.isFinite(result)?result:null;
+        };
+        const dateParts=value=>{
+          if(value instanceof Date&&!Number.isNaN(value.getTime()))return{year:value.getFullYear(),month:value.getMonth()+1,day:value.getDate()};
+          if(typeof value==='number'&&value>10000){const d=XLSX.SSF.parse_date_code(value);return d?{year:d.y,month:d.m,day:d.d}:null}
+          const match=String(value??'').match(/(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})/);
+          return match?{day:Number(match[1]),month:Number(match[2]),year:Number(match[3])}:null;
+        };
+        const time=value=>{
+          if(value==null||value==='')return'';
+          if(typeof value==='number'){
+            const minutes=((Math.round((value%1)*1440)%1440)+1440)%1440;
+            return String(Math.floor(minutes/60)).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
+          }
+          const match=String(value).trim().match(/(\\d{1,2}):(\\d{2})/);
+          return match?String(Number(match[1])%24).padStart(2,'0')+':'+match[2]:'';
+        };
+        const monthNames=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+        const months={};let found=0;
+        for(const sheetName of workbook.SheetNames){
+          const month=monthNames.indexOf(norm(sheetName));if(month<0)continue;
+          const ws=workbook.Sheets[sheetName],rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
+          const headerIndex=rows.findIndex(row=>row.some(value=>norm(value)==='fecha')&&row.some(value=>norm(value)==='entrada')&&row.some(value=>norm(value)==='salida')&&row.some(value=>norm(value).startsWith('almuerzo')));
+          if(headerIndex<0)continue;
+          const headers=rows[headerIndex].map(norm);
+          const dateCol=headers.indexOf('fecha'),entryCol=headers.indexOf('entrada'),exitCol=headers.indexOf('salida'),lunchCol=headers.findIndex(x=>x.startsWith('almuerzo'));
+          const days={};let calculatedHours=0;
+          for(const row of rows.slice(headerIndex+1)){
+            const date=dateParts(row[dateCol]);if(!date||date.year!==2026||date.month!==month+1)continue;
+            const entry=time(row[entryCol]),exit=time(row[exitCol]),lunchValue=number(row[lunchCol]);
+            const lunch=lunchValue==null?'':String(lunchValue);
+            if(entry&&exit){
+              const [eh,em]=entry.split(':').map(Number),[xh,xm]=exit.split(':').map(Number);
+              let worked=(xh*60+xm-eh*60-em)/60;if(worked<0)worked+=24;
+              const pause=lunch===''?0:Number(lunch);if(pause<0||pause>worked)throw new Error(`${sheetName}: pausa no válida el día ${date.day}.`);
+              calculatedHours+=worked-pause;
+            }
+            if(entry||exit||lunch!=='')days[String(date.day)]=[entry,exit,lunch];
+          }
+          const summaryValue=label=>{
+            const target=norm(label);
+            for(let r=0;r<headerIndex;r++)for(let c=0;c<rows[r].length-1;c++)if(norm(rows[r][c])===target)return rows[r][c+1];
+            return null;
+          };
+          const rate=number(summaryValue('Hora')),summaryHours=number(summaryValue('Total horas')),salary=number(summaryValue('Sueldo'));
+          if(rate==null||summaryHours==null)throw new Error(`${sheetName}: no encontré la tarifa por hora o el total de horas.`);
+          if(Math.abs(calculatedHours-summaryHours)>0.01)throw new Error(`${sheetName}: las horas de las jornadas no coinciden con el total de la hoja.`);
+          const expenses=[];
+          for(const [label,category,description,id] of [['Vuelo','Viajes','Vuelo (Excel)','vuelo'],['Mercado','Mercado','Mercado (Excel)','mercado']]){
+            const amount=number(summaryValue(label));if(amount>0)expenses.push({id:`excel-2026-${month}-${id}`,category,description,amount});
+          }
+          const adjustment=salary==null?0:Number((salary-calculatedHours*rate).toFixed(2));
+          if(adjustment< -0.005)expenses.push({id:`excel-2026-${month}-ajuste`,category:'Otros',description:'Ajuste del sueldo (Excel)',amount:-adjustment});
+          months[String(month)]={days,hourlyRate:rate,expenses};found++;
+        }
+        if(!found)throw new Error('No encontré hojas mensuales de 2026 con columnas Fecha, Entrada, Salida y Almuerzo.');
+        return{year:2026,source:fileName,months};
+      }
       $('importBtn').addEventListener('click',()=>$('importFile').click());
       $('importFile').addEventListener('change',async()=>{
         const file=$('importFile').files?.[0];if(!file)return;
         try{
-          const payload=JSON.parse(await file.text());
-          if(payload.year!==2026||!payload.months||typeof payload.months!=='object')throw new Error('El archivo no contiene una importación válida de 2026.');
+          if(!file.name.toLowerCase().endsWith('.xlsx'))throw new Error('Selecciona el libro Excel en formato .xlsx.');
+          const workbook=XLSX.read(await file.arrayBuffer(),{cellDates:true});
+          const payload=parseExcelImport(workbook,file.name);
           let monthCount=0,dayCount=0,expenseCount=0;
           for(const [monthText,monthData] of Object.entries(payload.months)){
-            const month=Number(monthText);if(!Number.isInteger(month)||month<0||month>11)throw new Error('Hay un mes fuera del calendario.');
-            const maxDay=new Date(2026,month+1,0).getDate(),monthKey=`nufri-jornada-v1-2026-${month}`;
+            const month=Number(monthText),maxDay=new Date(2026,month+1,0).getDate(),monthKey=`nufri-jornada-v1-2026-${month}`;
             let saved={};try{saved=JSON.parse(localStorage.getItem(monthKey)||'{}')}catch{}
-            for(const [dayText,row] of Object.entries(monthData.days||{})){
+            for(const [dayText,row] of Object.entries(monthData.days)){
               const day=Number(dayText);
-              if(!Number.isInteger(day)||day<1||day>maxDay||!Array.isArray(row)||row.length!==3)throw new Error('Hay un registro diario con formato o fecha no válida.');
-              if(row.some(Boolean)){saved[String(day)]=row;dayCount++}
+              if(!Number.isInteger(day)||day<1||day>maxDay||!Array.isArray(row)||row.length!==3)throw new Error('Hay un registro diario con fecha o formato no válido.');
+              saved[String(day)]=row;dayCount++;
             }
             localStorage.setItem(monthKey,JSON.stringify(saved));
-            if(Number.isFinite(Number(monthData.hourlyRate)))localStorage.setItem(`nufri-settings-v1-hourly-rate-2026-${month}`,JSON.stringify(Number(monthData.hourlyRate)));
+            localStorage.setItem(`nufri-settings-v1-hourly-rate-2026-${month}`,JSON.stringify(monthData.hourlyRate));
             const expKey=`nufri-expenses-v1-2026-${month}`;let expenses=[];try{expenses=JSON.parse(localStorage.getItem(expKey)||'[]')}catch{}
             if(!Array.isArray(expenses))expenses=[];
             const ids=new Set(expenses.map(item=>item.id));
-            for(const item of monthData.expenses||[]){if(!item.id||ids.has(item.id))continue;const amount=Number(item.amount);if(!Number.isFinite(amount)||amount<=0)throw new Error('Hay un gasto con importe no válido.');expenses.push({...item,amount});ids.add(item.id);expenseCount++}
+            for(const item of monthData.expenses){if(ids.has(item.id))continue;expenses.push(item);ids.add(item.id);expenseCount++}
             localStorage.setItem(expKey,JSON.stringify(expenses));monthCount++;
           }
           $('importFile').value='';if(Number(ys.value)===2026)render();
@@ -173,7 +241,7 @@
           $('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000);
         }catch(error){$('toast').textContent='No se pudo importar: '+error.message;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',5000)}
       });
-      $('exportBtn').addEventListener('click',exportCSV);$('refreshRate').addEventListener('click',refresh);ys.addEventListener('change',render);ms.addEventListener('change',render);
+            $('exportBtn').addEventListener('click',exportCSV);$('refreshRate').addEventListener('click',refresh);ys.addEventListener('change',render);ms.addEventListener('change',render);
       $('clearBtn').addEventListener('click',()=>{if(!confirm(`¿Vaciar jornada y gastos de ${months[Number(ms.value)]} ${ys.value}? Esta acción no se puede deshacer.`))return;localStorage.removeItem(key());localStorage.removeItem(expensesKey());render();$('toast').textContent='Mes vaciado';$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)});
       const scheme=window.matchMedia('(prefers-color-scheme: dark)');const applyTheme=()=>document.querySelector('meta[name="theme-color"]').content=scheme.matches?'#0c151e':'#172c46';applyTheme();scheme.addEventListener?.('change',applyTheme);
       ms.value='0';render();refresh();
