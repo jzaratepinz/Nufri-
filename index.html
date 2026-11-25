@@ -543,7 +543,7 @@
         const email = document.getElementById('authEmail').value.trim(), password = document.getElementById('authPassword').value;
         if (!email || password.length < 8) { setMessage('Escribe tu correo y una contraseña de al menos 8 caracteres.', 'error'); return; }
         setMessage('Creando cuenta…');
-        const { data, error } = await db.auth.signUp({ email, password });
+        const { data, error } = await db.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + window.location.pathname } });
         if (error) setMessage(error.message, 'error'); else if (data.session) await sync(data.user);
         else setMessage('Cuenta creada. Confirma el correo y luego inicia sesión.', 'ok');
       });
