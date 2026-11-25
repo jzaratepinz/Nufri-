@@ -36,3 +36,17 @@ create policy "Users can update own attendance months" on public.attendance_mont
 drop policy if exists "Users can delete own attendance months" on public.attendance_months;
 create policy "Users can delete own attendance months" on public.attendance_months
   for delete to authenticated using (auth.uid() = user_id);
+-- Añade a supabase/schema.sql o ejecuta este bloque si la tabla ya está creada.
+create table if not exists public.app_admins (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+alter table public.app_admins enable row level security;
+revoke all on public.app_admins from anon, authenticated;
+grant select on public.app_admins to authenticated;
+
+drop policy if exists "Admins can read their own role" on public.app_admins;
+create policy "Admins can read their own role" on public.app_admins
+  for select to authenticated using (auth.uid() = user_id);
+
