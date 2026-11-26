@@ -154,7 +154,13 @@
             <form id="authForm" class="auth-row">
               <label class="field">Correo electrónico<input id="authEmail" type="email" autocomplete="email" required></label>
               <label class="field">Contraseña<input id="authPassword" type="password" autocomplete="current-password" minlength="8" required></label>
-              <button class="primary" type="submit">Iniciar sesión</button><button id="signUpBtn" type="button">Crear cuenta</button><a class="button-link" href="./forgot-password.html">Olvidé mi contraseña</a>
+              <button class="primary" type="submit">Iniciar sesión</button><button id="signUpBtn" type="button">Crear cuenta</button><button id="forgotPasswordBtn" type="button">Olvidé mi contraseña</button>
+            </form>
+            <form id="recoveryRequestForm" class="auth-row" hidden>
+              <p class="profile-note" style="grid-column:1/-1;margin:0">Escribe el correo asociado a tu cuenta. Si está registrado, te enviaremos el enlace para crear una contraseña nueva.</p>
+              <label class="field">Correo electrónico<input id="recoveryEmail" type="email" autocomplete="email" inputmode="email" required></label>
+              <button id="sendRecoveryButton" class="primary" type="submit">Enviar enlace de recuperación</button>
+              <button id="backToLoginButton" type="button">Volver a iniciar sesión</button>
             </form>
             <div id="authMessage" class="auth-msg" role="status" aria-live="polite">Inicia sesión para sincronizar tus registros entre dispositivos.</div>
           </section>
@@ -529,6 +535,40 @@
         event.preventDefault(); setMessage('Iniciando sesión…');
         const { data, error } = await db.auth.signInWithPassword({ email: document.getElementById('authEmail').value.trim(), password: document.getElementById('authPassword').value });
         if (error) { const invalid = error.message === 'Invalid login credentials'; setMessage(invalid ? 'El correo o la contraseña de Nufri no coinciden. Cuentas moto y Nufri usan cuentas separadas. Si no recuerdas la contraseña de Nufri, toca «Olvidé mi contraseña».' : error.message, 'error'); } else await sync(data.user);
+      });
+      const recoveryRequestForm=document.getElementById('recoveryRequestForm');
+      const recoveryEmail=document.getElementById('recoveryEmail');
+      const recoveryButton=document.getElementById('sendRecoveryButton');
+      document.getElementById('forgotPasswordBtn').addEventListener('click',()=>{
+        document.getElementById('authForm').hidden=true;
+        recoveryRequestForm.hidden=false;
+        recoveryEmail.value=document.getElementById('authEmail').value.trim();
+        setMessage('Escribe el correo de tu cuenta Nufri para solicitar el enlace de recuperación.');
+        recoveryEmail.focus();
+      });
+      document.getElementById('backToLoginButton').addEventListener('click',()=>{
+        recoveryRequestForm.hidden=true;
+        document.getElementById('authForm').hidden=false;
+        setMessage('Inicia sesión para sincronizar tus registros entre dispositivos.');
+      });
+      recoveryRequestForm.addEventListener('submit',async event=>{
+        event.preventDefault();
+        const email=recoveryEmail.value.trim();
+        if(!email){recoveryEmail.focus();return}
+        recoveryButton.disabled=true;
+        recoveryButton.textContent='Enviando solicitud…';
+        setMessage('Conectando con el servicio de correo…');
+        const redirectTo=new URL('reset-password.html',window.location.href).toString();
+        try{
+          const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo});
+          if(error)throw error;
+          setMessage('Solicitud enviada. Si existe una cuenta con ese correo, recibirás el enlace. Revisa también spam y promociones.','ok');
+          recoveryButton.textContent='Solicitud enviada';
+        }catch(error){
+          setMessage(error.message||'No se pudo enviar la solicitud. Espera un momento e inténtalo de nuevo.','error');
+          recoveryButton.disabled=false;
+          recoveryButton.textContent='Enviar enlace de recuperación';
+        }
       });
       document.getElementById('signUpBtn').addEventListener('click', async () => {
         const email = document.getElementById('authEmail').value.trim(), password = document.getElementById('authPassword').value;
