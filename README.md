@@ -38,6 +38,7 @@ GitHub Pages publica `index.html`, `manifest.webmanifest` y los iconos desde `ma
 
 - `index.html` contiene la interfaz responsive, estilos, navegación, calendario, formularios, cálculos, gastos e integración cliente Supabase.
 - `reset-password.html` valida el enlace de recuperación, permite establecer una contraseña nueva y devuelve a la persona al inicio de sesión.
+- `forgot-password.html` solicita el correo y muestra el estado de envío del enlace de recuperación.
 - `supabase/schema.sql` define tablas y políticas RLS. `supabase/bootstrap_admin.sql` asigna el rol administrador a la cuenta confirmada que el propietario indique.
 - `supabase/functions/admin-users/index.ts` comprueba el token y el rol del solicitante en el servidor; usa la clave service role solo en el entorno privado de Supabase para consultar cuentas y restablecer contraseñas.
 - Los datos de jornadas, gastos, tasas y avatar se sincronizan por cuenta. No almacenar contraseñas en `localStorage`.
